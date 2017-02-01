@@ -4,23 +4,13 @@ project(snap-plugin-collector-rdt)
 include(CheckCXXCompilerFlag)
 check_cxx_compiler_flag("-std=c++11" COMPILER_SUPPORTS_CXX11)
 
-#message("Using Clang 3.5 as CXX compiler")
-#set(CMAKE_C_COMPILER "/usr/bin/clang")
-#set(CMAKE_C_FLAGS  "-Wall -std=c99")
-#set(CMAKE_C_FLAGS_DEBUG   "-g")
-#set(CMAKE_C_FLAGS_MINSIZEREL "-Os -DNDEBUG")
-#set(CMAKE_C_FLAGS_RELEASE   "-O4 -DNDEBUG")
-#set(CMAKE_C_FLAGS_RELWITHDEBINFO "-O2 -g")
-#set(CMAKE_CXX_COMPILER "/usr/bin/clang")
-#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Werror")
-#set(CMAKE_CXX_FLAGS_DEBUG "-g")
-#set(EXTRA_LIBRARIES "stdc++ m")
-
 if(COMPILER_SUPPORTS_CXX11)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 else()
     message(STATUS "Error: ${CMAKE_CXX_COMPILER} has no C++11 support")
 endif()
+
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fpermissive")
 
 include_directories(
         ${CMAKE_SOURCE_DIR}/include
@@ -29,7 +19,7 @@ include_directories(
 set(SOURCE_FILES
         src/main.cpp
         src/rdt/rdt.cpp
-        )
+        src/rdt/rdt_utils.cpp src/rdt/rdt_utils.hpp)
 
 add_executable(snap-plugin-collector-rdt ${SOURCE_FILES})
 

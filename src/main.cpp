@@ -4,8 +4,12 @@
 #include "rdt/rdt.hpp"
 
 int main() {
-    RDT rdt;
-    std::cout << rdt.name << " " << rdt.version << std::endl;
-    start_collector(&rdt, rdt.get_plugin_meta());
-    return 0;
+    try {
+        rdt::Collector rdt;
+        start_collector(&rdt, rdt.get_plugin_meta());
+        return 0;
+    } catch (const char* what) {
+        printf("Cannot launch RDT Collector: %s\n", what);
+        return -1;
+    }
 }

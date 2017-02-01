@@ -1,2 +1,3 @@
 /snap-plugin-collector-rdt
 build/*
+lib/so
