@@ -4,3 +4,9 @@
 [submodule "third_party/grpc"]
 	path = third_party/grpc
 	url = https://github.com/grpc/grpc
+[submodule "third_party/snap-plugin-lib-cpp"]
+	path = third_party/snap-plugin-lib-cpp
+	url = https://github.com/intelsdi-x/snap-plugin-lib-cpp
+[submodule "third_party/intel-cmt-cat"]
+	path = third_party/intel-cmt-cat
+	url = https://github.com/01org/intel-cmt-cat

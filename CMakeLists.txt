@@ -10,20 +10,34 @@ else()
     message(STATUS "Error: ${CMAKE_CXX_COMPILER} has no C++11 support")
 endif()
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fpermissive")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fpermissive -g")
+
+find_package(Protobuf REQUIRED)
+include_directories(${PROTOBUF_INCLUDE_DIRS})
 
 include_directories(
         ${CMAKE_SOURCE_DIR}/include
+        ${CMAKE_SOURCE_DIR}/include/snap
 )
 
 set(SOURCE_FILES
-        src/main.cpp
         src/rdt/rdt.cpp
-        src/rdt/rdt_utils.cpp src/rdt/rdt_utils.hpp)
+        src/rdt/rdt_utils.cpp
+        )
 
-add_executable(snap-plugin-collector-rdt ${SOURCE_FILES})
+add_executable(snap-plugin-collector-rdt src/main.cpp ${SOURCE_FILES})
+
+add_executable(test-rdt src/main_test.cpp ${SOURCE_FILES})
 
 target_link_libraries(snap-plugin-collector-rdt
+        ${CMAKE_SOURCE_DIR}/lib/libpqos.a
+        ${CMAKE_SOURCE_DIR}/lib/libsnap.a
+        protobuf
+        grpc++
+        )
+
+target_link_libraries(test-rdt
         ${CMAKE_SOURCE_DIR}/lib/libpqos.a
         ${CMAKE_SOURCE_DIR}/lib/libsnap.a
         protobuf

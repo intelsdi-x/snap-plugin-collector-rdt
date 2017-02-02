@@ -1,14 +1,8 @@
 #include <pqos.h>
-//#include <vector>
 #include "rdt_utils.hpp"
 
 
 namespace rdt {
-
-//    template <typename T>
-//    std::vector<T> sum_vectors(std::vector<T> left, std::vector<T> right) {
-//        return left;
-//    }
 
     bool has_monitoring_capability(const struct pqos_cap *capas, const pqos_mon_event event) {
         for (int capa_index = 0; capa_index < capas->num_cap; capa_index++) {

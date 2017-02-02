@@ -13,7 +13,7 @@ namespace rdt {
         int ret = 0;
 
         memset(&config, 0, sizeof(config));
-        config.fd_log = STDOUT_FILENO;
+        config.fd_log = STDERR_FILENO;
         config.verbose = 0;
 
         p_cpu = (pqos_cpuinfo*) calloc(1, sizeof(pqos_cpuinfo));
@@ -21,7 +21,7 @@ namespace rdt {
 
         ret = pqos_init(&config);
         if (ret != PQOS_RETVAL_OK) {
-            printf("Error initializing PQoS library!\n");
+            fprintf(stderr, "Error initializing PQoS library!\n");
             throw "Error initializing PQoS library";
         }
 
@@ -29,7 +29,7 @@ namespace rdt {
         ret = pqos_cap_get(&p_cap, &p_cpu);
         if (ret != PQOS_RETVAL_OK) {
             pqos_fini();
-            printf("Error retrieving PQoS capabilities!\n");
+            fprintf(stderr, "Error retrieving PQoS capabilities!\n");
             throw "Error retrieving PQoS capabilities";
         }
 
@@ -126,10 +126,10 @@ namespace rdt {
     }
 
     void Collector::setup_cmt_monitoring() {
-        printf("Resetting all RMIDs\n");
+        fprintf(stderr, "Resetting all RMIDs\n");
         int result = pqos_mon_reset();
         if (result != PQOS_RETVAL_OK) {
-            printf("pqos_mon_reset failed: %d\n", result);
+            fprintf(stderr, "pqos_mon_reset failed: %d\n", result);
             throw("Could not reset PQOS RMIDs: %d", result);
         }
         this->groups.clear();
@@ -153,7 +153,7 @@ namespace rdt {
                     context,
                     this->groups[group_id]);
             if (result != PQOS_RETVAL_OK) {
-                printf("pqos_mon_start failed: %d\n", result);
+                fprintf(stderr, "pqos_mon_start failed: %d\n", result);
                 throw("pqos_mon_start failed: %d", result);
             }
         }
@@ -168,7 +168,7 @@ namespace rdt {
                 &this->groups[0],
                 static_cast<unsigned int>(this->groups.size()));
         if (result != PQOS_RETVAL_OK) {
-            printf("pqos_mon_poll failed: %d\n", result);
+            fprintf(stderr, "pqos_mon_poll failed: %d\n", result);
             throw ("Polling from pqos monitor library failed: %d\n", result);
         }
         return;
