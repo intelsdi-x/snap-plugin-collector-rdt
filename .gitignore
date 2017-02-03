@@ -1,3 +1,6 @@
-/snap-plugin-collector-rdt
+snap-plugin-collector-rdt
 build/*
-lib/so
+lib/*
+.vagrant
+third_party/intel-cmt-cat
+third_party/snap-plugin-lib-cpp
