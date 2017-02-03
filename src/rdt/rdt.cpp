@@ -75,9 +75,9 @@ namespace rdt {
 
         if (this->cmt_capability) {
             // Load CMT metrcs.
-            if (this->is_monitoring_active) {
+            if (!this->is_monitoring_active) {
                 this->setup_cmt_monitoring();
-                usleep(10);
+                usleep(100);
             }
             std::vector<Plugin::Metric> monitoring_metrics = this->get_cmt_metrics();
             std::move(monitoring_metrics.begin(), monitoring_metrics.end(), std::back_inserter(metrics));

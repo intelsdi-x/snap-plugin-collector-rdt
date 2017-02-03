@@ -7,14 +7,12 @@ sudo yum install git cmake mc tmux
 sudo yum install autoconf automake libtool curl make unzip wget
 sudo yum install clang
 
-
 export CC=/usr/bin/gcc
 export CXX=/usr/bin/g++
 
 cd ../intel-cmt-cat/lib/
 make SHARED=n
 cp libpqos.a ../../../lib/
-
 
 export CC=/usr/bin/clang
 export CXX=/usr/bin/clang++
@@ -46,6 +44,5 @@ mkdir build
 make
 sudo make install
 cp build/lib/libsnap.a ../../lib
-
 
 export LD_LIBRARY_PATH=/usr/local/lib
