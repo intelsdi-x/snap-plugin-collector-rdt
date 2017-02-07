@@ -4,12 +4,6 @@ set -e
 
 mkdir -p lib
 
-sudo yum update -y
-sudo yum install -y \
-    git cmake mc tmux \
-    autoconf automake libtool curl make unzip wget \
-    clang gcc-c++ -y
-
 export CC=/usr/bin/gcc
 export CXX=/usr/bin/g++
 
@@ -19,7 +13,7 @@ make SHARED=n
 cp libpqos.a ../../../lib/
 popd
 
-if [ ! -d "./third_party/protobuf" ]
+if [ ! -d "./third_party/protobuf/gmock" ]
 then
 pushd `pwd`
 cd ./third_party/protobuf
