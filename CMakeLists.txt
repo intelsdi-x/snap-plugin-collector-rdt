@@ -10,8 +10,9 @@ else()
     message(STATUS "Error: ${CMAKE_CXX_COMPILER} has no C++11 support")
 endif()
 
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fpermissive -g")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS}")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fpermissive")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fpermissive")
 
 find_package(Protobuf REQUIRED)
 include_directories(${PROTOBUF_INCLUDE_DIRS})
@@ -33,13 +34,19 @@ add_executable(test-rdt src/main_test.cpp ${SOURCE_FILES})
 target_link_libraries(snap-plugin-collector-rdt
         ${CMAKE_SOURCE_DIR}/lib/libpqos.a
         ${CMAKE_SOURCE_DIR}/lib/libsnap.a
-        protobuf
-        grpc++
+        /usr/local/lib/libprotoc.a
+        /usr/local/lib/libprotobuf.a
+        /usr/local/lib/libgrpc++.a
+        /usr/local/lib/libgrpc.a
+        pthread
         )
 
 target_link_libraries(test-rdt
         ${CMAKE_SOURCE_DIR}/lib/libpqos.a
         ${CMAKE_SOURCE_DIR}/lib/libsnap.a
-        protobuf
-        grpc++
+        /usr/local/lib/libprotoc.a
+        /usr/local/lib/libprotobuf.a
+        /usr/local/lib/libgrpc++.a
+        /usr/local/lib/libgrpc.a
+        pthread
         )

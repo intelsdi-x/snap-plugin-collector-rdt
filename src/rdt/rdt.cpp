@@ -72,17 +72,17 @@ namespace rdt {
 
     void Collector::collect_metrics(std::vector<Plugin::Metric> &metrics) {
         metrics.clear();
-//
-//        if (this->cmt_capability) {
-//            // Load CMT metrcs.
-//            if (!this->is_monitoring_active) {
-//                this->setup_cmt_monitoring();
-//                usleep(100);
-//            }
-//            std::vector<Plugin::Metric> monitoring_metrics = this->get_cmt_metrics();
-//            std::move(monitoring_metrics.begin(), monitoring_metrics.end(), std::back_inserter(metrics));
-//        }
-//
+
+        if (this->cmt_capability) {
+            // Load CMT metrcs.
+            if (!this->is_monitoring_active) {
+                this->setup_cmt_monitoring();
+                usleep(100);
+            }
+            std::vector<Plugin::Metric> monitoring_metrics = this->get_cmt_metrics();
+            std::move(monitoring_metrics.begin(), monitoring_metrics.end(), std::back_inserter(metrics));
+        }
+
         std::vector<Plugin::Metric> capabilities = get_capabilities_metrics();
         std::move(capabilities.begin(), capabilities.end(), std::back_inserter(metrics));
 
@@ -176,23 +176,23 @@ namespace rdt {
 
     std::vector<Plugin::Metric> Collector::get_cmt_metrics() {
         std::vector<Plugin::Metric> metrics;
-//        this->poll_metrics();
-//
-//        std::vector<pqos_mon_data*>::iterator group;
-//        for (group = this->groups.begin(); group < this->groups.end(); group++){
-//            Plugin::Metric cmt_bytes;
-//
-//            int cmt_data = static_cast<int>((*group)->values.llc);
-//            cmt_bytes.set_data(cmt_data);
-//            cmt_bytes.set_ns({{"intel"}, {"rdt"}, {"llc_occupancy"}, {std::to_string((*group)->cores[0])}, {"bytes"}});
-//
-//            Plugin::Metric cmt_percentage;
-//            cmt_percentage.set_data((static_cast<double>(cmt_data) / static_cast<double>(this->llc_size)) * 100);
-//            cmt_percentage.set_ns({{"intel"}, {"rdt"}, {"llc_occupancy"}, {std::to_string((*group)->cores[0])}, {"percentage"}});
-//
-//            metrics.push_back(cmt_bytes);
-//            metrics.push_back(cmt_percentage);
-//        }
+        this->poll_metrics();
+
+        std::vector<pqos_mon_data*>::iterator group;
+        for (group = this->groups.begin(); group < this->groups.end(); group++){
+            Plugin::Metric cmt_bytes;
+
+            int cmt_data = static_cast<int>((*group)->values.llc);
+            cmt_bytes.set_data(cmt_data);
+            cmt_bytes.set_ns({{"intel"}, {"rdt"}, {"llc_occupancy"}, {std::to_string((*group)->cores[0])}, {"bytes"}});
+
+            Plugin::Metric cmt_percentage;
+            cmt_percentage.set_data((static_cast<double>(cmt_data) / static_cast<double>(this->llc_size)) * 100);
+            cmt_percentage.set_ns({{"intel"}, {"rdt"}, {"llc_occupancy"}, {std::to_string((*group)->cores[0])}, {"percentage"}});
+
+            metrics.push_back(cmt_bytes);
+            metrics.push_back(cmt_percentage);
+        }
         return metrics;
     }
 

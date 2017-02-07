@@ -58,5 +58,6 @@ sudo make install
 cp build/lib/libsnap.a ../../lib
 popd
 
-sudo cp /usr/local/lib/* /usr/lib
+# /usr/local/lib is usually not in LD_LIBRARY_PATH
+#sudo cp /usr/local/lib/* /usr/lib
 sudo ldconfig -v
