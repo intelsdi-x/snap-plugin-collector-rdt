@@ -7,15 +7,17 @@ check_cxx_compiler_flag("-std=c++11" COMPILER_SUPPORTS_CXX11)
 if(COMPILER_SUPPORTS_CXX11)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 else()
-    message(STATUS "Error: ${CMAKE_CXX_COMPILER} has no C++11 support")
+    message(FATAL_ERROR "Error: ${CMAKE_CXX_COMPILER} has no C++11 support")
 endif()
 
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS}")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fpermissive")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fpermissive")
 
 find_package(Protobuf REQUIRED)
 include_directories(${PROTOBUF_INCLUDE_DIRS})
+
+find_package( ZLIB REQUIRED )
+include_directories( ${ZLIB_INCLUDE_DIRS} )
 
 include_directories(
         ${CMAKE_SOURCE_DIR}/include
@@ -38,6 +40,7 @@ target_link_libraries(snap-plugin-collector-rdt
         /usr/local/lib/libprotobuf.a
         /usr/local/lib/libgrpc++.a
         /usr/local/lib/libgrpc.a
+        ${ZLIB_LIBRARIES}
         pthread
         )
 
@@ -48,5 +51,6 @@ target_link_libraries(test-rdt
         /usr/local/lib/libprotobuf.a
         /usr/local/lib/libgrpc++.a
         /usr/local/lib/libgrpc.a
+        ${ZLIB_LIBRARIES}
         pthread
         )
