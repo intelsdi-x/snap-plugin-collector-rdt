@@ -1,6 +1,7 @@
 #include <iostream>
 #include <sstream>
 
+#include "google/protobuf/repeated_field.h"
 #include "snap/plugin.h"
 #include "rdt/rdt.hpp"
 
@@ -16,11 +17,22 @@ int main() {
     try {
         rdt::Collector rdt;
 
-        std::vector<Plugin::Metric> metrics;
-        rdt.collect_metrics(metrics);
+        rpc::ConfigMap map;
+        Plugin::Config config(map);
 
-        for (auto iter = metrics.begin(); iter != metrics.end(); iter++) {
-            std::cout << "namespace: " << print_ns(*iter) << " | int data: " << (*iter).get_int_data() << std::endl;
+        auto metric_types = rdt.get_metric_types(config);
+
+        for (auto iter = metric_types.begin(); iter != metric_types.end(); iter++) {
+            std::cout << "namespace: " << print_ns(*iter) << " | int data: " << (*iter).get_int_data() << "| float data: " << (*iter).get_float64_data() << " | dynamic elements: "<< (*iter).dynamic_ns_elements().size() << std::endl;
+        }
+
+        std::cout << "---------------------------------------------------------" << std::endl;
+
+        std::vector<Plugin::Metric> collected_metrics;
+        rdt.collect_metrics(collected_metrics);
+
+        for (auto iter = collected_metrics.begin(); iter != collected_metrics.end(); iter++) {
+            std::cout << "namespace: " << print_ns(*iter) << " | int data: " << (*iter).get_int_data() << "| float data: " << (*iter).get_float64_data() << " | dynamic elements: "<< (*iter).dynamic_ns_elements().size() << std::endl;
         }
 
         return 0;
@@ -29,4 +41,3 @@ int main() {
         return -1;
     }
 }
-

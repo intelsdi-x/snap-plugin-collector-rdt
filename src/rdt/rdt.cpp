@@ -198,13 +198,18 @@ namespace rdt {
         for (group = this->groups.begin(); group < this->groups.end(); group++){
             Plugin::Metric cmt_bytes;
 
+            Plugin::Metric::NamespaceElement dynamicCoreIdElement;
+            dynamicCoreIdElement.value = std::to_string((*group)->cores[0]);
+            dynamicCoreIdElement.name = "[core_id]";
+            dynamicCoreIdElement.description = "Cache occupancy for core_id";
+
             int cmt_data = static_cast<int>((*group)->values.llc);
             cmt_bytes.set_data(cmt_data);
-            cmt_bytes.set_ns({{"intel"}, {"rdt"}, {"llc_occupancy"}, {std::to_string((*group)->cores[0])}, {"bytes"}});
+            cmt_bytes.set_ns({{"intel"}, {"rdt"}, {"llc_occupancy"}, dynamicCoreIdElement, {"bytes"}});
 
             Plugin::Metric cmt_percentage;
             cmt_percentage.set_data((static_cast<double>(cmt_data) / static_cast<double>(this->llc_size)) * 100);
-            cmt_percentage.set_ns({{"intel"}, {"rdt"}, {"llc_occupancy"}, {std::to_string((*group)->cores[0])}, {"percentage"}});
+            cmt_percentage.set_ns({{"intel"}, {"rdt"}, {"llc_occupancy"}, dynamicCoreIdElement, {"percentage"}});
 
             metrics.push_back(cmt_bytes);
             metrics.push_back(cmt_percentage);
@@ -224,13 +229,19 @@ namespace rdt {
         if (this->cmt_capability) {
             for (int cpu_index = 0; cpu_index < this->core_count; cpu_index++) {
                 std::string core_id = std::to_string(cpu_index);
+
+                Plugin::Metric::NamespaceElement dynamicCoreIdElement;
+                dynamicCoreIdElement.value = "*";
+                dynamicCoreIdElement.name = "[core_id]";
+                dynamicCoreIdElement.description = "Cache occupancy for core_id";
+
                 Plugin::Metric llc_occupancy_bytes(
-                        {{"intel"}, {"rdt"}, {"llc_occupancy"}, {core_id}, {"bytes"}},
+                        {{"intel"}, {"rdt"}, {"llc_occupancy"}, dynamicCoreIdElement, {"bytes"}},
                         "bytes",
                         "Total LLC Occupancy of CPU " + core_id + " in bytes."
                 );
                 Plugin::Metric llc_occupancy_percentage(
-                        {{"intel"}, {"rdt"}, {"llc_occupancy"}, {core_id}, {"percentage"}},
+                        {{"intel"}, {"rdt"}, {"llc_occupancy"}, dynamicCoreIdElement, {"percentage"}},
                         "percentage",
                         "Total LLC Occupancy of CPU " + core_id + " in bytes."
                 );
