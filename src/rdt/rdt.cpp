@@ -1,5 +1,5 @@
 #include <cstdlib>
-#include <exception>
+#include <sstream>
 
 #include "rdt.hpp"
 #include "rdt_utils.hpp"
@@ -21,16 +21,20 @@ namespace rdt {
 
         ret = pqos_init(&config);
         if (ret != PQOS_RETVAL_OK) {
-            fprintf(stderr, "Error initializing PQoS library!\n");
-            throw "Error initializing PQoS library";
+            std::stringstream ss;
+            ss << "Error initializing PQoS library: " << ret << std::endl;
+            fprintf(stderr, ss.str().c_str());
+            throw Plugin::PluginException(ss.str());
         }
 
         /* Get CMT capability and CPU info pointer */
         ret = pqos_cap_get(&p_cap, &p_cpu);
         if (ret != PQOS_RETVAL_OK) {
             pqos_fini();
-            fprintf(stderr, "Error retrieving PQoS capabilities!\n");
-            throw "Error retrieving PQoS capabilities";
+            std::stringstream ss;
+            ss << "Error initializing PQoS capabilities: " << ret << std::endl;
+            fprintf(stderr, ss.str().c_str());
+            throw Plugin::PluginException(ss.str());
         }
 
         this->cmt_capability = has_cmt_capability(p_cap);
@@ -86,6 +90,12 @@ namespace rdt {
         std::vector<Plugin::Metric> capabilities = get_capabilities_metrics();
         std::move(capabilities.begin(), capabilities.end(), std::back_inserter(metrics));
 
+        auto now = std::chrono::system_clock::now();
+        for (auto metric = metrics.begin(); metric < metrics.end(); metric++) {
+            (*metric).set_last_advertised_time(now);
+            (*metric).set_timestamp(now);
+        }
+
         return;
     }
 
@@ -129,8 +139,10 @@ namespace rdt {
         fprintf(stderr, "Resetting all RMIDs\n");
         int result = pqos_mon_reset();
         if (result != PQOS_RETVAL_OK) {
-            fprintf(stderr, "pqos_mon_reset failed: %d\n", result);
-            throw("Could not reset PQOS RMIDs: %d", result);
+            std::stringstream ss;
+            ss << "Could not reset PQoS RMIDs: " << result << std::endl;
+            fprintf(stderr, ss.str().c_str());
+            throw Plugin::PluginException(ss.str());
         }
         this->groups.clear();
         this->groups.reserve(static_cast<unsigned long>(this->core_count));
@@ -153,8 +165,10 @@ namespace rdt {
                     context,
                     this->groups[group_id]);
             if (result != PQOS_RETVAL_OK) {
-                fprintf(stderr, "pqos_mon_start failed: %d\n", result);
-                throw("pqos_mon_start failed: %d", result);
+                std::stringstream ss;
+                ss << "Could not start PQoS monitoring: " << result << std::endl;
+                fprintf(stderr, ss.str().c_str());
+                throw Plugin::PluginException(ss.str());
             }
         }
 
@@ -168,8 +182,10 @@ namespace rdt {
                 &this->groups[0],
                 static_cast<unsigned int>(this->groups.size()));
         if (result != PQOS_RETVAL_OK) {
-            fprintf(stderr, "pqos_mon_poll failed: %d\n", result);
-            throw ("Polling from pqos monitor library failed: %d\n", result);
+            std::stringstream ss;
+            ss << "Could not poll PQoS metrics: " << result << std::endl;
+            fprintf(stderr, ss.str().c_str());
+            throw Plugin::PluginException(ss.str());
         }
         return;
     }
@@ -261,4 +277,3 @@ namespace rdt {
     }
 
 }  // namespace rdt
-
