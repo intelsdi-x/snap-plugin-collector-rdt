@@ -1,2 +1,4 @@
-/snap-plugin-collector-rdt
+snap-plugin-collector-rdt
 build/*
+lib/*
+.vagrant
