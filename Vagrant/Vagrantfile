@@ -15,24 +15,17 @@ Vagrant.configure("2") do |config|
   # boxes at https://atlas.hashicorp.com/search.
   config.vm.box = "centos/7"
 
-#  home_dir = vagrant_user == 'root' ? '/root/' : "/home/#{vagrant_user}"
   config.vm.synced_folder "..", "/home/vagrant/snap-plugin-collector-rdt", :mount_options => ["umask=0022,dmask=0022,fmask=0022"]
-#  if File.directory?(File.expand_path("#{ENV['HOME']}/swan_s3_creds"))
-#       config.vm.synced_folder "#{ENV['HOME']}/swan_s3_creds", "#{home_dir}/swan_s3_creds", :mount_options => ["umask=0022,dmask=0022,fmask=0022"]
-#  end
 
   config.vm.provider "virtualbox" do |vb, override|
     vb.gui = false
     vb.name = "snap-plugin-collector-rdt"
 
-    vb.cpus = (ENV['VBOX_CPUS'] != '' && ENV['VBOX_CPUS'] || 2)       # NOTE: integration tests fail with less than 2
-    vb.memory = (ENV['VBOX_MEM'] != '' && ENV['VBOX_MEM'] || 4096)    # NOTE: integration tests tend to crash with less (gcc)
+    vb.cpus = (ENV['VBOX_CPUS'] != '' && ENV['VBOX_CPUS'] || 2)
+    vb.memory = (ENV['VBOX_MEM'] != '' && ENV['VBOX_MEM'] || 4096)
 
     override.ssh.insert_key = true
     override.ssh.keys_only = true
-#    if ENV["SHARE_GLIDE_CACHE"] == "true" and File.directory?(File.expand_path("#{ENV['HOME']}/.glide"))
-#      override.vm.synced_folder "#{ENV['HOME']}/.glide", "#{home_dir}/.glide", :mount_options => ["umask=0022,dmask=0022,fmask=0022"]
-#    end
   end
 
   # Disable automatic box update checking. If you disable this, then
