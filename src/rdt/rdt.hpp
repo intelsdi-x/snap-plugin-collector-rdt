@@ -29,7 +29,6 @@ namespace rdt {
 
         std::vector<Plugin::Metric> get_cmt_metrics();
 
-        std::vector<Plugin::Metric> get_pqos_namespaces();
         void setup_cmt_monitoring();
         void poll_metrics();
 
@@ -47,7 +46,7 @@ namespace rdt {
 
         bool cmt_capability;
         bool mbm_local_capability;
-        bool l3ca_capabilty;  // L3 Cache Allocation Capability.
+        bool l3ca_capability;  // L3 Cache Allocation Capability.
 
         int core_count;
         int llc_size;

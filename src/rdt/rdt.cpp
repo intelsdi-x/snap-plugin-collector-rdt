@@ -36,7 +36,7 @@ namespace rdt {
 
         this->cmt_capability = has_cmt_capability(p_cap);
         this->mbm_local_capability = has_local_mbm_capability(p_cap);
-        this->l3ca_capabilty = has_l3_cache_allocation_capabilities(p_cap);
+        this->l3ca_capability = has_l3_cache_allocation_capabilities(p_cap);
 
         this->core_count = p_cpu->num_cores;
         this->cache_way_size = p_cpu->l3.way_size;
@@ -165,7 +165,7 @@ namespace rdt {
 
         Plugin::Metric l3ca_capa_metric;
         l3ca_capa_metric.set_ns(l3ca_ns);
-        l3ca_capa_metric.set_data(this->l3ca_capabilty);
+        l3ca_capa_metric.set_data(this->l3ca_capability);
         capabilities.push_back(l3ca_capa_metric);
 
         Plugin::Metric llc_size_metric;
