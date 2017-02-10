@@ -16,9 +16,6 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fpermissive")
 find_package(Protobuf REQUIRED)
 include_directories(${PROTOBUF_INCLUDE_DIRS})
 
-find_package( ZLIB REQUIRED )
-include_directories( ${ZLIB_INCLUDE_DIRS} )
-
 include_directories(
         ${CMAKE_SOURCE_DIR}/include
         ${CMAKE_SOURCE_DIR}/include/snap
@@ -40,7 +37,6 @@ target_link_libraries(snap-plugin-collector-rdt
         /usr/local/lib/libprotobuf.a
         /usr/local/lib/libgrpc++.a
         /usr/local/lib/libgrpc.a
-        ${ZLIB_LIBRARIES}
         pthread
         )
 
@@ -51,6 +47,5 @@ target_link_libraries(test-rdt
         /usr/local/lib/libprotobuf.a
         /usr/local/lib/libgrpc++.a
         /usr/local/lib/libgrpc.a
-        ${ZLIB_LIBRARIES}
         pthread
         )

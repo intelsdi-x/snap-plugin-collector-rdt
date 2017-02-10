@@ -7,8 +7,8 @@
 
 std::string print_ns(Plugin::Metric metric) {
     std::ostringstream stream;
-    for (auto iter = metric.ns().begin(); iter != metric.ns().end(); iter++) {
-        stream << "/" << (*iter).value;
+    for (auto& element : metric.ns()) {
+        stream << "/" << element.value;
     }
     return stream.str();
 }
@@ -22,8 +22,8 @@ int main() {
 
         auto metric_types = rdt.get_metric_types(config);
 
-        for (auto iter = metric_types.begin(); iter != metric_types.end(); iter++) {
-            std::cout << "namespace: " << print_ns(*iter) << " | int data: " << (*iter).get_int_data() << "| float data: " << (*iter).get_float64_data() << " | dynamic elements: "<< (*iter).dynamic_ns_elements().size() << std::endl;
+        for (auto& metric : metric_types) {
+            std::cout << "namespace: " << print_ns(metric) << " | int data: " << metric.get_int_data() << "| float data: " << metric.get_float64_data() << " | dynamic elements: "<< metric.dynamic_ns_elements().size() << std::endl;
         }
 
         std::cout << "---------------------------------------------------------" << std::endl;
@@ -31,8 +31,8 @@ int main() {
         std::vector<Plugin::Metric> collected_metrics;
         rdt.collect_metrics(collected_metrics);
 
-        for (auto iter = collected_metrics.begin(); iter != collected_metrics.end(); iter++) {
-            std::cout << "namespace: " << print_ns(*iter) << " | int data: " << (*iter).get_int_data() << "| float data: " << (*iter).get_float64_data() << " | dynamic elements: "<< (*iter).dynamic_ns_elements().size() << std::endl;
+        for (auto& metric : collected_metrics) {
+            std::cout << "namespace: " << print_ns(metric) << " | int data: " << metric.get_int_data() << "| float data: " << metric.get_float64_data() << " | dynamic elements: "<< metric.dynamic_ns_elements().size() << std::endl;
         }
 
         return 0;

@@ -7,7 +7,7 @@
 namespace rdt {
 
     Collector::Collector() {
-        struct pqos_config config;
+        struct pqos_config config = {0};
         const struct pqos_cpuinfo *p_cpu = NULL;
         const struct pqos_cap *p_cap = NULL;
         int ret = 0;
@@ -15,9 +15,6 @@ namespace rdt {
         memset(&config, 0, sizeof(config));
         config.fd_log = STDERR_FILENO;
         config.verbose = 0;
-
-        p_cpu = (pqos_cpuinfo*) calloc(1, sizeof(pqos_cpuinfo));
-        p_cap = (pqos_cap*) calloc(1, sizeof(pqos_cap));
 
         ret = pqos_init(&config);
         if (ret != PQOS_RETVAL_OK) {
@@ -65,13 +62,67 @@ namespace rdt {
     }
 
     std::vector<Plugin::Metric> Collector::get_metric_types(Plugin::Config cfg) {
-        std::vector<Plugin::Metric> result;
+        std::vector<Plugin::Metric> namespaces;
 
-        std::vector<Plugin::Metric> pqos_metrics = this->get_pqos_namespaces();
-        result.reserve(result.size() + pqos_metrics.size());
-        std::move(pqos_metrics.begin(), pqos_metrics.end(), std::back_inserter(result));
+        // CMT Count.
+        if (this->cmt_capability) {
+            for (int cpu_index = 0; cpu_index < this->core_count; cpu_index++) {
+                Plugin::Metric::NamespaceElement dynamicCoreIdElement;
+                dynamicCoreIdElement.value = "*";
+                dynamicCoreIdElement.name = "[core_id]";
+                dynamicCoreIdElement.description = "Cache occupancy for core_id";
 
-        return result;
+                std::string core_id = std::to_string(cpu_index);
+                Plugin::Metric llc_occupancy_bytes(
+                        {{"intel"}, {"rdt"}, {"llc_occupancy"}, dynamicCoreIdElement, {"bytes"}},
+                        "bytes",
+                        "Total LLC Occupancy of CPU " + core_id + " in bytes."
+                );
+                Plugin::Metric llc_occupancy_percentage(
+                        {{"intel"}, {"rdt"}, {"llc_occupancy"}, dynamicCoreIdElement, {"percentage"}},
+                        "percentage",
+                        "Total LLC Occupancy of CPU " + core_id + " in bytes."
+                );
+
+                namespaces.push_back(llc_occupancy_bytes);
+                namespaces.push_back(llc_occupancy_percentage);
+            }
+        }
+
+        // Monitoring capabilities.
+        namespaces.push_back(Plugin::Metric(
+                cmt_capability_ns,
+                "bool",
+                "This CPU supports LLC Cache Monitoring."
+        ));
+
+        namespaces.push_back(Plugin::Metric(
+                mbm_local_monitoring_ns,
+                "bool",
+                "This CPU supports Local Memory Bandwidth Monitoring."
+        ));
+
+
+        // CAT Capabilities.
+        namespaces.push_back(Plugin::Metric(
+                llc_size_ns,
+                "bytes",
+                "LLC Size."
+        ));
+
+        namespaces.push_back(Plugin::Metric(
+                cache_ways_count_ns,
+                "bytes",
+                "Number of cache ways in Last Level Cache."
+        ));
+
+        namespaces.push_back(Plugin::Metric(
+                cache_way_size_ns,
+                "bytes",
+                "Size of cache way in Last Level Cache."
+        ));
+
+        return namespaces;
     }
 
     void Collector::collect_metrics(std::vector<Plugin::Metric> &metrics) {
@@ -90,10 +141,10 @@ namespace rdt {
         std::vector<Plugin::Metric> capabilities = get_capabilities_metrics();
         std::move(capabilities.begin(), capabilities.end(), std::back_inserter(metrics));
 
-        auto now = std::chrono::system_clock::now();
-        for (auto metric = metrics.begin(); metric < metrics.end(); metric++) {
-            (*metric).set_last_advertised_time(now);
-            (*metric).set_timestamp(now);
+        const auto now = std::chrono::system_clock::now();
+        for (auto& metric : metrics) {
+            metric.set_last_advertised_time(now);
+            metric.set_timestamp(now);
         }
 
         return;
@@ -149,6 +200,9 @@ namespace rdt {
 
         for (int group_id = 0; group_id < this->core_count; group_id++) {
             pqos_mon_data* mon_data_group = (pqos_mon_data*) calloc(1, sizeof(pqos_mon_data));
+            if (mon_data_group == nullptr) {
+                throw Plugin::PluginException("Could not allocate memory for monitoring data structure");
+            }
             this->groups.push_back(mon_data_group);
         }
 
@@ -194,16 +248,15 @@ namespace rdt {
         std::vector<Plugin::Metric> metrics;
         this->poll_metrics();
 
-        std::vector<pqos_mon_data*>::iterator group;
-        for (group = this->groups.begin(); group < this->groups.end(); group++){
+        for (auto& group : this->groups){
             Plugin::Metric cmt_bytes;
 
             Plugin::Metric::NamespaceElement dynamicCoreIdElement;
-            dynamicCoreIdElement.value = std::to_string((*group)->cores[0]);
+            dynamicCoreIdElement.value = std::to_string(group->cores[0]);
             dynamicCoreIdElement.name = "[core_id]";
             dynamicCoreIdElement.description = "Cache occupancy for core_id";
 
-            int cmt_data = static_cast<int>((*group)->values.llc);
+            int cmt_data = static_cast<int>(group->values.llc);
             cmt_bytes.set_data(cmt_data);
             cmt_bytes.set_ns({{"intel"}, {"rdt"}, {"llc_occupancy"}, dynamicCoreIdElement, {"bytes"}});
 
@@ -219,72 +272,6 @@ namespace rdt {
 
     Plugin::Meta Collector::get_plugin_meta() {
         return Plugin::Meta(Plugin::Collector, this->name, this->version);
-    }
-
-
-    std::vector<Plugin::Metric> Collector::get_pqos_namespaces() {
-        std::vector<Plugin::Metric> namespaces;
-
-        // CMT Count.
-        if (this->cmt_capability) {
-            for (int cpu_index = 0; cpu_index < this->core_count; cpu_index++) {
-                std::string core_id = std::to_string(cpu_index);
-
-                Plugin::Metric::NamespaceElement dynamicCoreIdElement;
-                dynamicCoreIdElement.value = "*";
-                dynamicCoreIdElement.name = "[core_id]";
-                dynamicCoreIdElement.description = "Cache occupancy for core_id";
-
-                Plugin::Metric llc_occupancy_bytes(
-                        {{"intel"}, {"rdt"}, {"llc_occupancy"}, dynamicCoreIdElement, {"bytes"}},
-                        "bytes",
-                        "Total LLC Occupancy of CPU " + core_id + " in bytes."
-                );
-                Plugin::Metric llc_occupancy_percentage(
-                        {{"intel"}, {"rdt"}, {"llc_occupancy"}, dynamicCoreIdElement, {"percentage"}},
-                        "percentage",
-                        "Total LLC Occupancy of CPU " + core_id + " in bytes."
-                );
-
-                namespaces.push_back(llc_occupancy_bytes);
-                namespaces.push_back(llc_occupancy_percentage);
-            }
-        }
-
-        // Monitoring capabilities.
-        namespaces.push_back(Plugin::Metric(
-                cmt_capability_ns,
-                "bool",
-                "This CPU supports LLC Cache Monitoring."
-        ));
-
-        namespaces.push_back(Plugin::Metric(
-                mbm_local_monitoring_ns,
-                "bool",
-                "This CPU supports Local Memory Bandwidth Monitoring."
-        ));
-
-
-        // CAT Capabilities.
-        namespaces.push_back(Plugin::Metric(
-                llc_size_ns,
-                "bytes",
-                "LLC Size."
-        ));
-
-        namespaces.push_back(Plugin::Metric(
-                cache_ways_count_ns,
-                "bytes",
-                "Number of cache ways in Last Level Cache."
-        ));
-
-        namespaces.push_back(Plugin::Metric(
-                cache_way_size_ns,
-                "bytes",
-                "Size of cache way in Last Level Cache."
-        ));
-
-        return namespaces;
     }
 
 }  // namespace rdt
