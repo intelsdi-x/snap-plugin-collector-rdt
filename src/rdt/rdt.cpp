@@ -253,7 +253,7 @@ namespace rdt {
 
             Plugin::Metric::NamespaceElement dynamicCoreIdElement;
             dynamicCoreIdElement.value = std::to_string(group->cores[0]);
-            dynamicCoreIdElement.name = "[core_id]";
+            dynamicCoreIdElement.name = "core_id";
             dynamicCoreIdElement.description = "Cache occupancy for core_id";
 
             int cmt_data = static_cast<int>(group->values.llc);
