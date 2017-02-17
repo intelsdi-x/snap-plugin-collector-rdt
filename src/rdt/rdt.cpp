@@ -69,7 +69,7 @@ namespace rdt {
             for (int cpu_index = 0; cpu_index < this->core_count; cpu_index++) {
                 Plugin::Metric::NamespaceElement dynamicCoreIdElement;
                 dynamicCoreIdElement.value = "*";
-                dynamicCoreIdElement.name = "[core_id]";
+                dynamicCoreIdElement.name = "core_id";
                 dynamicCoreIdElement.description = "Cache occupancy for core_id";
 
                 std::string core_id = std::to_string(cpu_index);
