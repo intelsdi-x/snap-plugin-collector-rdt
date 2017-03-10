@@ -78,11 +78,13 @@ Vagrant.configure("2") do |config|
   # Enable provisioning with a shell script. Additional provisioners such as
   # Puppet, Chef, Ansible, Salt, and Docker are also available. Please see the
   # documentation for more information about their specific syntax and use.
-   config.vm.provision "shell", inline: <<-SHELL
-     sudo yum update -y &&
-     sudo yum install -y \
-       git cmake mc tmux \
-       autoconf automake libtool curl make unzip wget \
-       clang gcc-c++
-   SHELL
+  config.vm.provision "shell", inline: <<-SHELL
+    sudo yum update -y
+    sudo yum install -y git cmake mc tmux autoconf automake libtool curl make unzip wget clang gcc-c++ sudo
+    cd snap-plugin-collector-rdt
+    git submodule update --init --recursive
+    ./install_deps_centos.sh
+    ./build.sh
+    ./test.sh
+  SHELL
 end

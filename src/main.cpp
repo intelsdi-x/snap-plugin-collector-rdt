@@ -4,12 +4,18 @@
 #include "rdt/rdt.hpp"
 
 int main() {
-    try {
-        rdt::Collector rdt;
-        start_collector(&rdt, rdt.get_plugin_meta());
-        return 0;
+    int exit_code = -1;
+    auto pqos = new PQOS();
+    rdt::Collector *rdt;
+    try
+    {
+        rdt = new rdt::Collector(new PQOS());
+        start_collector(rdt, rdt->get_plugin_meta());
+        exit_code = 0;
     } catch (const char* what) {
         fprintf(stderr, "Cannot launch RDT Collector: %s\n", what);
-        return -1;
     }
+    delete(rdt);
+    delete(pqos);
+    return exit_code;
 }

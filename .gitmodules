@@ -10,3 +10,6 @@
 [submodule "third_party/intel-cmt-cat"]
 	path = third_party/intel-cmt-cat
 	url = https://github.com/01org/intel-cmt-cat
+[submodule "third_party/googletest"]
+	path = third_party/googletest
+	url = https://github.com/google/googletest

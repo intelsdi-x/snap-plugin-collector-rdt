@@ -1,13 +1,22 @@
 # snap-plugin-collector-rdt
 RDT Collector for Snap
 
-Quick start instructions:
+## Vagrant configuration
+Vagrant configuration needed for VirtualBox provider:
+```bash
+vagrant plugin install vagrant-vbguest
+```
+
+## Quick start instructions:
 ```bash
 cd Vagrant
 vagrant up
+```
+
+## To rebuild plugin after changes done:
+```bash
 vagrant ssh
 cd snap-plugin-collector-rdt/
-git submodule update --init --recursive
-./install_deps_centos.sh
 ./build.sh
+./test.sh
 ```
