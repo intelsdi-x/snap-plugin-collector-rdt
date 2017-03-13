@@ -18,5 +18,12 @@ vagrant up
 vagrant ssh
 cd snap-plugin-collector-rdt/
 ./build.sh
-./test.sh
 ```
+
+## To build with coverage data and run unit tests:
+```bash
+vagrant ssh
+cd snap-plugin-collector-rdt/
+TEST_TYPE=medium ./test.sh
+```
+
