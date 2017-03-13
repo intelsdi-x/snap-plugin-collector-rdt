@@ -34,6 +34,7 @@ popd
 
 pushd `pwd`
 cd ./third_party/grpc
+git checkout tags/v1.0.1
 git submodule update --init
 make -j2
 sudo make install
@@ -50,6 +51,15 @@ mkdir -p build
 make -j2
 sudo make install
 cp build/lib/libsnap.a ../../lib
+popd
+
+pushd `pwd`
+cd ./third_party/googletest
+cmake CMakeLists.txt
+make -j2
+sudo make install
+cp googlemock/libgmock.a ../../lib
+cp googlemock/gtest/libgtest.a ../../lib
 popd
 
 # /usr/local/lib is usually not in LD_LIBRARY_PATH

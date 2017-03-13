@@ -13,8 +13,16 @@ endif()
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS}")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fpermissive")
 
+# Add coverage data
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -O0 --coverage")
+
+# Include Protobuf
 find_package(Protobuf REQUIRED)
 include_directories(${PROTOBUF_INCLUDE_DIRS})
+
+# Include GTest
+find_package(GTest REQUIRED)
+include_directories(${GTEST_INCLUDE_DIRS})
 
 include_directories(
         ${CMAKE_SOURCE_DIR}/include
@@ -28,7 +36,9 @@ set(SOURCE_FILES
 
 add_executable(snap-plugin-collector-rdt src/main.cpp ${SOURCE_FILES})
 
+# Unit tests
 add_executable(test-rdt src/main_test.cpp ${SOURCE_FILES})
+add_executable(test-medium src/medium_test.cpp ${SOURCE_FILES})
 
 target_link_libraries(snap-plugin-collector-rdt
         ${CMAKE_SOURCE_DIR}/lib/libpqos.a
@@ -43,6 +53,18 @@ target_link_libraries(snap-plugin-collector-rdt
 target_link_libraries(test-rdt
         ${CMAKE_SOURCE_DIR}/lib/libpqos.a
         ${CMAKE_SOURCE_DIR}/lib/libsnap.a
+        /usr/local/lib/libprotoc.a
+        /usr/local/lib/libprotobuf.a
+        /usr/local/lib/libgrpc++.a
+        /usr/local/lib/libgrpc.a
+        pthread
+        )
+
+target_link_libraries(test-medium
+        ${CMAKE_SOURCE_DIR}/lib/libpqos.a
+        ${CMAKE_SOURCE_DIR}/lib/libsnap.a
+        ${CMAKE_SOURCE_DIR}/lib/libgmock.a
+        ${CMAKE_SOURCE_DIR}/lib/libgtest.a
         /usr/local/lib/libprotoc.a
         /usr/local/lib/libprotobuf.a
         /usr/local/lib/libgrpc++.a

@@ -10,7 +10,7 @@ namespace rdt {
                 int supported_events = capas->capabilities[capa_index].u.mon->num_events;
                 for (int event_idx = 0; event_idx < supported_events; event_idx++) {
                     if (event == capas->capabilities[capa_index].u.mon->events[event_idx].type) {
-                        return true;
+                       return true;
                     }
                 }
             }

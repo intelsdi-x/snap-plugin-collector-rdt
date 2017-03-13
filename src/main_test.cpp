@@ -14,13 +14,17 @@ std::string print_ns(Plugin::Metric metric) {
 }
 
 int main() {
-    try {
-        rdt::Collector rdt;
+    int exit_code = -1;
+    auto pqos = new PQOS();
+    rdt::Collector *rdt;
+    try
+    {
+        rdt = new rdt::Collector(pqos);
 
         rpc::ConfigMap map;
         Plugin::Config config(map);
 
-        auto metric_types = rdt.get_metric_types(config);
+        auto metric_types = rdt->get_metric_types(config);
 
         for (auto& metric : metric_types) {
             std::cout << "namespace: " << print_ns(metric) << " | int data: " << metric.get_int_data() << "| float data: " << metric.get_float64_data() << " | dynamic elements: "<< metric.dynamic_ns_elements().size() << std::endl;
@@ -29,15 +33,17 @@ int main() {
         std::cout << "---------------------------------------------------------" << std::endl;
 
         std::vector<Plugin::Metric> collected_metrics;
-        rdt.collect_metrics(collected_metrics);
+        rdt->collect_metrics(collected_metrics);
 
         for (auto& metric : collected_metrics) {
             std::cout << "namespace: " << print_ns(metric) << " | int data: " << metric.get_int_data() << "| float data: " << metric.get_float64_data() << " | dynamic elements: "<< metric.dynamic_ns_elements().size() << std::endl;
         }
 
-        return 0;
+        exit_code = 0;
     } catch (const char* what) {
         fprintf(stderr, "Cannot launch RDT Collector: %s\n", what);
-        return -1;
     }
+    delete(rdt);
+    delete(pqos);
+    return exit_code;
 }
