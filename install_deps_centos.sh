@@ -29,7 +29,7 @@ cd ./third_party/protobuf
 ./autogen.sh
 ./configure
 make -j2
-sudo make install
+make install
 popd
 
 pushd `pwd`
@@ -37,7 +37,7 @@ cd ./third_party/grpc
 git checkout tags/v1.0.1
 git submodule update --init
 make -j2
-sudo make install
+make install
 popd
 
 export CC=/usr/bin/clang
@@ -49,7 +49,7 @@ mkdir -p build
 ./autogen.sh
 ./configure -prefix=`pwd`/build
 make -j2
-sudo make install
+make install
 cp build/lib/libsnap.a ../../lib
 popd
 
@@ -57,11 +57,11 @@ pushd `pwd`
 cd ./third_party/googletest
 cmake CMakeLists.txt
 make -j2
-sudo make install
+make install
 cp googlemock/libgmock.a ../../lib
 cp googlemock/gtest/libgtest.a ../../lib
 popd
 
 # /usr/local/lib is usually not in LD_LIBRARY_PATH
 #sudo cp /usr/local/lib/* /usr/lib
-sudo ldconfig -v
+ldconfig -v

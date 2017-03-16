@@ -1,0 +1,21 @@
+sudo: required
+language: cpp
+services:
+  - docker
+env:
+  matrix:
+    - TEST_TYPE=medium
+before_install:
+  - docker build -t for-worker-box -f Docker/Dockerfile.travis .
+install:
+  - docker run -dt --name "worker-box" -e TEST_TYPE -e GTEST_ROOT -v ${TRAVIS_BUILD_DIR}/:/${TRAVIS_REPO_SLUG} for-worker-box bash
+script:
+  - docker exec -ti worker-box bash -c "cd /${TRAVIS_REPO_SLUG} && git submodule update --init"
+  - docker exec -ti worker-box bash -c "cd /${TRAVIS_REPO_SLUG} && ./install_deps_centos.sh"
+  - docker exec -ti worker-box bash -c "cd /${TRAVIS_REPO_SLUG} && ./test.sh"
+after_script:
+  - docker rm -fv worker-box
+notifications:
+  email: false
+  slack:
+    secure: VkbZLIc2RH8yf3PtIAxUNPdAu3rQQ7yQx0GcK124JhbEnZGaHyK615V0rbG7HcVmYKGPdB0cXqZiLBDKGqGKb2zR1NepOe1nF03jxGSpPq8jIFeEXSJGEYGL34ScDzZZGuG6qwbjFcXiW5lqn6t8igzp7v2+URYBaZo5ktCS2xY=

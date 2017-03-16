@@ -1,8 +1,17 @@
 #!/usr/bin/env bash
-echo "RUNNING TESTS:"
-./build/test-medium
+if [ -z "$TEST_TYPE" ]; then
+    echo "Please set TEST_TYPE environment variable!"
+    exit 1
+fi
 
-echo "------------------"
+./build.sh
+
+echo "--------------"
+echo "RUNNING TESTS:"
+echo "--------------"
+./build/test-${TEST_TYPE}
+
+echo "------------------------"
 echo "CHECKING TESTS COVERAGE:"
-echo "------------------"
-gcov -n ./build/CMakeFiles/test-medium.dir/src/medium_test.cpp.o | grep "medium_test.cpp" -A2
+echo "------------------------"
+gcov -n ./build/CMakeFiles/test-medium.dir/src/${TEST_TYPE}_test.cpp.o | grep "${TEST_TYPE}_test.cpp" -A2
