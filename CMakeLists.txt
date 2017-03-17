@@ -29,6 +29,7 @@ include_directories(${GTEST_INCLUDE_DIRS})
 include_directories(
         ${CMAKE_SOURCE_DIR}/include
         ${CMAKE_SOURCE_DIR}/include/snap
+        ${CMAKE_SOURCE_DIR}/third_party/intel-cmt-cat/lib
 )
 
 set(SOURCE_FILES

@@ -199,6 +199,12 @@ std::vector<Plugin::Metric> Collector::get_metric_types(Plugin::Config cfg)
             "This CPU supports Remote Memory Bandwidth Monitoring."
     ));
 
+    metrics.push_back(Plugin::Metric(
+            rdt::l3ca_ns,
+            "bool",
+            "This CPU supports L3CA capabilities."
+    ));
+
 
     // CAT Capabilities.
     metrics.push_back(Plugin::Metric(
@@ -225,7 +231,7 @@ void Collector::collect_metrics(std::vector<Plugin::Metric> &metrics)
 
         // Load metrics.
         if (!this->is_monitoring_active) {
-            this->setup_cmt_monitoring();
+            this->setup_monitoring();
             usleep(100);
         }
         this->poll_metrics();
@@ -267,15 +273,11 @@ std::vector<Plugin::Metric> Collector::get_capabilities_metrics()
     mbm_local_capa_metric.set_data(this->mbm_local_capability);
     capabilities.push_back(mbm_local_capa_metric);
 
-        Plugin::Metric mbm_remote_capa_metric;
-        mbm_remote_capa_metric.set_ns(mbm_remote_monitoring_ns);
-        mbm_remote_capa_metric.set_data(this->mbm_remote_capability);
-        capabilities.push_back(mbm_remote_capa_metric);
+    Plugin::Metric mbm_remote_capa_metric;
+    mbm_remote_capa_metric.set_ns(mbm_remote_monitoring_ns);
+    mbm_remote_capa_metric.set_data(this->mbm_remote_capability);
+    capabilities.push_back(mbm_remote_capa_metric);
 
-        Plugin::Metric l3ca_capa_metric;
-        l3ca_capa_metric.set_ns(l3ca_ns);
-        l3ca_capa_metric.set_data(this->l3ca_capability);
-        capabilities.push_back(l3ca_capa_metric);
     Plugin::Metric l3ca_capa_metric;
     l3ca_capa_metric.set_ns(rdt::l3ca_ns);
     l3ca_capa_metric.set_data(this->l3ca_capability);
@@ -299,7 +301,7 @@ std::vector<Plugin::Metric> Collector::get_capabilities_metrics()
     return capabilities;
 }
 
-void Collector::setup_cmt_monitoring()
+void Collector::setup_monitoring()
 {
     fprintf(stderr, "Resetting all RMIDs\n");
     int result = pqos->pqos_mon_reset();
@@ -372,7 +374,7 @@ void Collector::poll_metrics()
     return;
 }
 
-    std::vector<Plugin::Metric> Collector::get_cmt_metrics() {
+std::vector<Plugin::Metric> Collector::get_cmt_metrics() {
         std::vector<Plugin::Metric> metrics;
 
     for (auto &group : this->groups)

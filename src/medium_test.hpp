@@ -5,6 +5,12 @@
 #include "gmock/gmock.h"
 #include "rdt/rdt.hpp"
 
+typedef struct {
+    double expected_value;
+    bool is_float;
+} rdt_metric_data;
+typedef std::unordered_map<std::string, rdt_metric_data> rdt_metric_map;
+
 class PQOSMock : public PQOSInterface
 {
 public:
