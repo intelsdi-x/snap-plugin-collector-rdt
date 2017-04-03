@@ -1,5 +1,10 @@
-# snap-plugin-collector-rdt
-RDT Collector for Snap
+# Snap Intel Resource Director Technology Collector
+
+RDT enables Cache Occupancy measurment and Memory Bandwidth monitoring.
+
+For more information about RDT, please see http://www.intel.com/content/www/us/en/architecture-and-technology/resource-director-technology.html
+
+This plugin utilizes https://github.com/01org/intel-cmt-cat.
 
 ## Vagrant configuration
 Vagrant configuration needed for VirtualBox provider:
