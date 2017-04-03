@@ -26,6 +26,10 @@ namespace rdt {
         return has_monitoring_capability(capas, PQOS_MON_EVENT_LMEM_BW);
     }
 
+    bool has_remote_mbm_capability(const struct pqos_cap *capas) {
+        return has_monitoring_capability(capas, PQOS_MON_EVENT_RMEM_BW);
+    }
+
     bool has_l3_cache_allocation_capabilities(const struct pqos_cap *capas) {
         for (int capability_index = 0; capability_index < capas->num_cap; capability_index++) {
             if (capas->capabilities[capability_index].type == PQOS_CAP_TYPE_L3CA) {

@@ -4,6 +4,7 @@ if [ -z "$TEST_TYPE" ]; then
     exit 1
 fi
 
+rm ./build/test-${TEST_TYPE}
 ./build.sh
 
 echo "--------------"
