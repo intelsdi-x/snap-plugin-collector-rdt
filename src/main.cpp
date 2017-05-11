@@ -16,14 +16,15 @@
 
 #include "snap/plugin.h"
 #include "rdt/rdt.hpp"
+#include "rdt/pqos.hpp"
 
 int main() {
     int exit_code = -1;
-    auto pqos = new PQOS();
+    auto pqos = new rdt::PQOS();
     rdt::Collector *rdt;
     try
     {
-        rdt = new rdt::Collector(new PQOS());
+        rdt = new rdt::Collector(pqos);
         start_collector(rdt, rdt->get_plugin_meta());
         exit_code = 0;
     } catch (const char* what) {

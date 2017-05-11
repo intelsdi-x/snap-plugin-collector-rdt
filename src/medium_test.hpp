@@ -18,12 +18,16 @@
 #include "pqos.h"
 #include "gmock/gmock.h"
 #include "rdt/rdt.hpp"
+#include "rdt/pqos.hpp"
 
 typedef struct {
     double expected_value;
     bool is_float;
 } rdt_metric_data;
 typedef std::unordered_map<std::string, rdt_metric_data> rdt_metric_map;
+
+namespace rdt
+{
 
 class PQOSMock : public PQOSInterface
 {
@@ -37,5 +41,7 @@ public:
     MOCK_METHOD1(pqos_mon_stop, int(struct pqos_mon_data *group));
     MOCK_METHOD2(pqos_mon_poll, int(struct pqos_mon_data **groups, const unsigned num_groups));
 };
+
+}  // namespace rdt
 
 #endif // SNAP_PLUGIN_COLLECTOR_RDT_MEDIUM_TEST_HPP
