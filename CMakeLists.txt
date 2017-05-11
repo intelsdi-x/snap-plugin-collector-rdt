@@ -48,6 +48,7 @@ include_directories(
 )
 
 set(SOURCE_FILES
+        src/rdt/pqos.cpp
         src/rdt/rdt.cpp
         src/rdt/rdt_utils.cpp
         )
