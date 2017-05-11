@@ -1,0 +1,17 @@
+Snap Plugin Collector RDT
+Copyright 2016 Intel Corporation.
+
+This product includes Profobuf, a software developed by Google Inc.
+License is available at https://github.com/google/protobuf/blob/master/LICENSE.
+For more details see https://github.com/google/protobuf/
+
+This product includes GRPC, a software developed by Google Inc which is available under a "3-clause BSD"
+For more details see https://github.com/grpc/grpc
+
+This product includes googletest, a software developed by Google Inc.
+License is available at https://github.com/google/googletest/blob/master/googletest/LICENSE
+For more details see https://github.com/google/googletest
+
+This product includes googlemock, a software developed by Google Inc.
+License is available at https://github.com/google/googletest/blob/master/googlemock/LICENSE
+For more details see https://github.com/google/googletest
