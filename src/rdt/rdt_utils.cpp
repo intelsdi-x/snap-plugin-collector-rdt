@@ -12,7 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <pqos.h>
+#include <vector>
+#include <string>
+#include <sstream>
+
+#include "pqos.h"
+#include "snap/metric.h"
 #include "rdt_utils.hpp"
 
 
@@ -52,5 +57,41 @@ namespace rdt {
         }
         return false;
     }
+
+    std::string merge_namespace(const std::vector<Plugin::Metric::NamespaceElement>& ns)
+    {
+        std::ostringstream oss;
+        for (auto& element : ns)
+        {
+            oss << element.value << "/";
+        }
+        return oss.str();
+    }
+
+    bool isMetricNamespaceEqual(
+            const std::vector<Plugin::Metric::NamespaceElement>& left,
+            const std::vector<Plugin::Metric::NamespaceElement>& right)
+    {
+        std::string left_namespace = merge_namespace(left);
+        std::string right_namespace = merge_namespace(right);
+
+        bool is_string_equal = (0 == left_namespace.compare(right_namespace));
+        return is_string_equal;
+    }
+
+    Plugin::Metric* find_metric_with_namespace(Plugin::Metric requested_metric, std::vector<Plugin::Metric> metrics)
+    {
+        std::string requested_namespace = merge_namespace(requested_metric.ns());
+        for (auto& metric : metrics)
+        {
+            std::string metric_ns = merge_namespace(metric.ns());
+            if (requested_namespace.compare(metric_ns) == 0)
+            {
+                return &metric;
+            }
+        }
+        return nullptr;
+    }
+
 
 }  // namespace rdt

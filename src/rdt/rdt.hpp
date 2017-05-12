@@ -51,6 +51,7 @@ namespace rdt
     private:
         Collector(const Collector &that){};
 
+        std::vector<Plugin::Metric> collect_available_metrics();
         std::vector<Plugin::Metric> get_cmt_metrics();
 
         void setup_monitoring();

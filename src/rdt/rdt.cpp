@@ -207,36 +207,64 @@ std::vector<Plugin::Metric> Collector::get_metric_types(Plugin::Config cfg)
 
 void Collector::collect_metrics(std::vector<Plugin::Metric> &metrics)
 {
-    metrics.clear();
-
-        // Load metrics.
-        if (!this->is_monitoring_active) {
-            this->setup_monitoring();
-            usleep(100);
-        }
-        this->poll_metrics();
-
-        if (this->cmt_capability) {
-            std::vector<Plugin::Metric> monitoring_metrics = this->get_cmt_metrics();
-            std::move(monitoring_metrics.begin(), monitoring_metrics.end(), std::back_inserter(metrics));
-        }
-
-        if (this->mbm_local_capability || this->mbm_remote_capability) {
-            std::vector<Plugin::Metric> monitoring_metrics = this->get_mbm_metrics();
-            std::move(monitoring_metrics.begin(), monitoring_metrics.end(), std::back_inserter(metrics));
-        }
-
-        std::vector<Plugin::Metric> capabilities = get_capabilities_metrics();
-        std::move(capabilities.begin(), capabilities.end(), std::back_inserter(metrics));
-
+    std::vector<Plugin::Metric> available_metrics = collect_available_metrics();
     const auto now = std::chrono::system_clock::now();
-    for (auto &metric : metrics)
+
+    for (auto& metric : metrics)
     {
-        metric.set_last_advertised_time(now);
-        metric.set_timestamp(now);
+        auto found_metric = find_metric_with_namespace(metric, available_metrics);
+        if (found_metric  != nullptr) {
+            auto data_type = found_metric->data_type();
+            switch(data_type) {
+                case Plugin::Metric::String:
+                    metric.set_data(found_metric->get_string_data());
+                    break;
+                case Plugin::Metric::Float32:
+                    metric.set_data(found_metric->get_float32_data());
+                    break;
+                case Plugin::Metric::Float64:
+                    metric.set_data(found_metric->get_float64_data());
+                    break;
+                case Plugin::Metric::Int32:
+                    metric.set_data(found_metric->get_int_data());
+                    break;
+                default:
+                    break;
+            }
+
+            metric.set_timestamp(now);
+        }
     }
 
+
     return;
+}
+
+std::vector<Plugin::Metric> Collector::collect_available_metrics()
+{
+    std::vector<Plugin::Metric> metrics;
+
+    // Load metrics.
+    if (!this->is_monitoring_active) {
+        this->setup_monitoring();
+        usleep(100);
+    }
+    this->poll_metrics();
+
+    if (this->cmt_capability) {
+        std::vector<Plugin::Metric> monitoring_metrics = this->get_cmt_metrics();
+        std::move(monitoring_metrics.begin(), monitoring_metrics.end(), std::back_inserter(metrics));
+    }
+
+    if (this->mbm_local_capability || this->mbm_remote_capability) {
+        std::vector<Plugin::Metric> monitoring_metrics = this->get_mbm_metrics();
+        std::move(monitoring_metrics.begin(), monitoring_metrics.end(), std::back_inserter(metrics));
+    }
+
+    std::vector<Plugin::Metric> capabilities = get_capabilities_metrics();
+    std::move(capabilities.begin(), capabilities.end(), std::back_inserter(metrics));
+
+    return metrics;
 }
 
 std::vector<Plugin::Metric> Collector::get_capabilities_metrics()
