@@ -23,6 +23,9 @@ namespace rdt {
     bool has_remote_mbm_capability(const struct pqos_cap *capas);
     bool has_l3_cache_allocation_capabilities(const struct pqos_cap *capas);
 
+    Plugin::Metric* find_metric_with_namespace(Plugin::Metric requested_metric, std::vector<Plugin::Metric> metrics);
+    bool isMetricNamespaceEqual(const std::vector<Plugin::Metric::NamespaceElement>& left, const std::vector<Plugin::Metric::NamespaceElement>& right);
+
 }  // namespace rdt
 
 #endif  // SNAP_PLUGIN_COLLECTOR_RDT_RDT_UTILS_HPP

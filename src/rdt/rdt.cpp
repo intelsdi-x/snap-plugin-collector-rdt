@@ -18,40 +18,6 @@
 #include "rdt.hpp"
 #include "rdt_utils.hpp"
 
-int PQOS::pqos_init(const pqos_config *config)
-{
-    return ::pqos_init(config);
-}
-
-int PQOS::pqos_cap_get(const struct pqos_cap **cap, const struct pqos_cpuinfo **cpu)
-{
-    return ::pqos_cap_get(cap, cpu);
-}
-
-int PQOS::pqos_fini()
-{
-    return ::pqos_fini();
-}
-
-int PQOS::pqos_mon_start(const unsigned num_cores, const unsigned *cores, const enum pqos_mon_event event, void *context, struct pqos_mon_data *group)
-{
-    return ::pqos_mon_start(num_cores, cores, event, context, group);
-}
-
-int PQOS::pqos_mon_reset()
-{
-    return ::pqos_mon_reset();
-}
-
-int PQOS::pqos_mon_stop(struct pqos_mon_data *group)
-{
-    return ::pqos_mon_stop(group);
-}
-
-int PQOS::pqos_mon_poll(struct pqos_mon_data **groups, const unsigned num_groups)
-{
-    return ::pqos_mon_poll(groups, num_groups);
-}
 
 namespace rdt
 {
@@ -241,36 +207,64 @@ std::vector<Plugin::Metric> Collector::get_metric_types(Plugin::Config cfg)
 
 void Collector::collect_metrics(std::vector<Plugin::Metric> &metrics)
 {
-    metrics.clear();
-
-        // Load metrics.
-        if (!this->is_monitoring_active) {
-            this->setup_monitoring();
-            usleep(100);
-        }
-        this->poll_metrics();
-
-        if (this->cmt_capability) {
-            std::vector<Plugin::Metric> monitoring_metrics = this->get_cmt_metrics();
-            std::move(monitoring_metrics.begin(), monitoring_metrics.end(), std::back_inserter(metrics));
-        }
-
-        if (this->mbm_local_capability || this->mbm_remote_capability) {
-            std::vector<Plugin::Metric> monitoring_metrics = this->get_mbm_metrics();
-            std::move(monitoring_metrics.begin(), monitoring_metrics.end(), std::back_inserter(metrics));
-        }
-
-        std::vector<Plugin::Metric> capabilities = get_capabilities_metrics();
-        std::move(capabilities.begin(), capabilities.end(), std::back_inserter(metrics));
-
+    std::vector<Plugin::Metric> available_metrics = collect_available_metrics();
     const auto now = std::chrono::system_clock::now();
-    for (auto &metric : metrics)
+
+    for (auto& metric : metrics)
     {
-        metric.set_last_advertised_time(now);
-        metric.set_timestamp(now);
+        auto found_metric = find_metric_with_namespace(metric, available_metrics);
+        if (found_metric  != nullptr) {
+            auto data_type = found_metric->data_type();
+            switch(data_type) {
+                case Plugin::Metric::String:
+                    metric.set_data(found_metric->get_string_data());
+                    break;
+                case Plugin::Metric::Float32:
+                    metric.set_data(found_metric->get_float32_data());
+                    break;
+                case Plugin::Metric::Float64:
+                    metric.set_data(found_metric->get_float64_data());
+                    break;
+                case Plugin::Metric::Int32:
+                    metric.set_data(found_metric->get_int_data());
+                    break;
+                default:
+                    break;
+            }
+
+            metric.set_timestamp(now);
+        }
     }
 
+
     return;
+}
+
+std::vector<Plugin::Metric> Collector::collect_available_metrics()
+{
+    std::vector<Plugin::Metric> metrics;
+
+    // Load metrics.
+    if (!this->is_monitoring_active) {
+        this->setup_monitoring();
+        usleep(100);
+    }
+    this->poll_metrics();
+
+    if (this->cmt_capability) {
+        std::vector<Plugin::Metric> monitoring_metrics = this->get_cmt_metrics();
+        std::move(monitoring_metrics.begin(), monitoring_metrics.end(), std::back_inserter(metrics));
+    }
+
+    if (this->mbm_local_capability || this->mbm_remote_capability) {
+        std::vector<Plugin::Metric> monitoring_metrics = this->get_mbm_metrics();
+        std::move(monitoring_metrics.begin(), monitoring_metrics.end(), std::back_inserter(metrics));
+    }
+
+    std::vector<Plugin::Metric> capabilities = get_capabilities_metrics();
+    std::move(capabilities.begin(), capabilities.end(), std::back_inserter(metrics));
+
+    return metrics;
 }
 
 std::vector<Plugin::Metric> Collector::get_capabilities_metrics()
