@@ -400,7 +400,7 @@ std::vector<Plugin::Metric> Collector::get_cmt_metrics() {
         dynamicCoreIdElement.name = "core_id";
         dynamicCoreIdElement.description = "Cache occupancy for core_id";
 
-        int cmt_data = static_cast<int>(group->values.llc);
+        double cmt_data = static_cast<double>(group->values.llc);
         cmt_bytes.set_data(cmt_data);
         cmt_bytes.set_ns({{"intel"}, {"rdt"}, {"llc_occupancy"}, dynamicCoreIdElement, {"bytes"}});
 
@@ -426,7 +426,7 @@ std::vector<Plugin::Metric> Collector::get_cmt_metrics() {
             coreId.description = "Memory bandwidth usage per core_id";
 
             if (this->mbm_local_capability) {
-                int local_mbw = static_cast<int>(group->values.mbm_local_delta);
+                double local_mbw = static_cast<double>(group->values.mbm_local_delta);
                 coreId.description = "core_id to gather local memory bandwidth for";
                 mbw.set_data(local_mbw);
                 mbw.set_ns({{"intel"}, {"rdt"}, {"memory_bandwidth"}, {"local"}, coreId, {"bytes"}});
@@ -434,13 +434,13 @@ std::vector<Plugin::Metric> Collector::get_cmt_metrics() {
             }
 
             if (this->mbm_remote_capability) {
-                int remote_mbw = static_cast<int>(group->values.mbm_remote_delta);
+                double remote_mbw = static_cast<double>(group->values.mbm_remote_delta);
                 coreId.description = "core_id to gather remote memory bandwidth for";
                 mbw.set_data(remote_mbw);
                 mbw.set_ns({{"intel"}, {"rdt"}, {"memory_bandwidth"}, {"remote"}, coreId, {"bytes"}});
                 metrics.push_back(mbw);
 
-                int total_mbw = static_cast<int>(group->values.mbm_total_delta);
+                double total_mbw = static_cast<double>(group->values.mbm_total_delta);
                 coreId.description = "core_id to gather total memory bandwidth for";
                 mbw.set_data(total_mbw);
                 mbw.set_ns({{"intel"}, {"rdt"}, {"memory_bandwidth"}, {"total"}, coreId, {"bytes"}});\
