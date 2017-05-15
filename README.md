@@ -34,6 +34,13 @@ cd Vagrant
 vagrant up
 ```
 
+## Build on Centos 7 without Vagrant instructions:
+```bash
+git submodule update --init
+./install_deps_centos.sh
+./build.sh
+```
+
 ## To rebuild plugin after changes done:
 ```bash
 vagrant ssh
@@ -47,4 +54,3 @@ vagrant ssh
 cd snap-plugin-collector-rdt/
 TEST_TYPE=medium ./test.sh
 ```
-
