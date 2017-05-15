@@ -36,6 +36,7 @@ vagrant up
 
 ## Build on Centos 7 without Vagrant instructions:
 ```bash
+sudo yum install -y git cmake mc tmux autoconf automake libtool curl make unzip wget clang gcc-c++
 git submodule update --init
 ./install_deps_centos.sh
 ./build.sh
