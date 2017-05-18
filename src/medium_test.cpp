@@ -357,11 +357,11 @@ void emplace_per_core_metrics(rdt_metric_map *expected_values, double llc_size, 
 
     // List of per-core metrics and expected values
     auto cpu_id_entry = std::to_string(cpu_id);
-    expected_values->emplace("/intel/rdt/llc_occupancy/" + cpu_id_entry + "/bytes", rdt_metric_data{expected_value : cmt_data, is_float: false});
+    expected_values->emplace("/intel/rdt/llc_occupancy/" + cpu_id_entry + "/bytes", rdt_metric_data{expected_value : cmt_data, is_float: true});
     expected_values->emplace("/intel/rdt/llc_occupancy/" + cpu_id_entry + "/percentage", rdt_metric_data{expected_value : llc_percentage, is_float: true});
-    expected_values->emplace("/intel/rdt/memory_bandwidth/local/" + cpu_id_entry + "/bytes", rdt_metric_data{expected_value : mbm_data_local, is_float: false});
-    expected_values->emplace("/intel/rdt/memory_bandwidth/remote/" + cpu_id_entry + "/bytes", rdt_metric_data{expected_value : mbm_data_remote, is_float: false});
-    expected_values->emplace("/intel/rdt/memory_bandwidth/total/" + cpu_id_entry + "/bytes", rdt_metric_data{expected_value : mbm_data_total, is_float: false});
+    expected_values->emplace("/intel/rdt/memory_bandwidth/local/" + cpu_id_entry + "/bytes", rdt_metric_data{expected_value : mbm_data_local, is_float: true});
+    expected_values->emplace("/intel/rdt/memory_bandwidth/remote/" + cpu_id_entry + "/bytes", rdt_metric_data{expected_value : mbm_data_remote, is_float: true});
+    expected_values->emplace("/intel/rdt/memory_bandwidth/total/" + cpu_id_entry + "/bytes", rdt_metric_data{expected_value : mbm_data_total, is_float: true});
 }
 
 int main(int argc, char **argv)
