@@ -20,21 +20,11 @@ RDT enables Cache Occupancy measurment and Memory Bandwidth monitoring.
 
 For more information about RDT, please see http://www.intel.com/content/www/us/en/architecture-and-technology/resource-director-technology.html
 
-This plugin utilizes https://github.com/01org/intel-cmt-cat.
+This plugin utilizes https://github.com/01org/intel-cmt-cat. It has been tested on CentOS 7.3.1611, Kernel 3.14.32 on Xeon D-1541.
 
-## Vagrant configuration
-Vagrant configuration needed for VirtualBox provider:
-```bash
-vagrant plugin install vagrant-vbguest
-```
+Collected metrics are available in [METRICS.md](METRICS.md).
 
-## Quick start instructions:
-```bash
-cd Vagrant
-vagrant up
-```
-
-## Build on Centos 7 without Vagrant instructions:
+## Build Instructions on Centos 7
 ```bash
 sudo yum install -y git cmake mc tmux autoconf automake libtool curl make unzip wget clang gcc-c++
 git submodule update --init
@@ -42,14 +32,20 @@ git submodule update --init
 ./build.sh
 ```
 
-## To rebuild plugin after changes done:
+### Vagrant VM
+
+Plugin provides vagrant development environment.
+`vagrant-vbguest` plugin is required for directory sync.
+
 ```bash
-vagrant ssh
-cd snap-plugin-collector-rdt/
-./build.sh
+vagrant plugin install vagrant-vbguest
+cd Vagrant
+vagrant up
 ```
 
-## To build with coverage data and run unit tests:
+
+## To run unit tests with coverage data:
+
 ```bash
 vagrant ssh
 cd snap-plugin-collector-rdt/
