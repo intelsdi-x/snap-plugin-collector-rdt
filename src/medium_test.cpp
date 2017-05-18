@@ -16,6 +16,15 @@
 #include "rdt/rdt_utils.hpp"
 #include "gtest/gtest.h"
 
+int main(int argc, char **argv)
+{
+    testing::InitGoogleTest(&argc, argv);
+    return RUN_ALL_TESTS();
+}
+
+namespace rdt
+{
+
 using ::testing::_;
 using ::testing::Return;
 using ::testing::DoAll;
@@ -364,12 +373,6 @@ void emplace_per_core_metrics(rdt_metric_map *expected_values, double llc_size, 
     expected_values->emplace("/intel/rdt/memory_bandwidth/total/" + cpu_id_entry + "/bytes", rdt_metric_data{expected_value : mbm_data_total, is_float: true});
 }
 
-int main(int argc, char **argv)
-{
-    testing::InitGoogleTest(&argc, argv);
-    return RUN_ALL_TESTS();
-}
-
 bool is_prefix(std::string const &prefix, std::string const &str)
 {
     auto res = std::mismatch(prefix.begin(), prefix.end(), str.begin());
@@ -480,3 +483,5 @@ std::vector<Plugin::Metric> fixture_metrics(unsigned cpu_cores)
 
     return metrics;
 }
+
+}  // namespace rdt

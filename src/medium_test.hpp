@@ -18,6 +18,10 @@
 #include "pqos.h"
 #include "gmock/gmock.h"
 #include "rdt/rdt.hpp"
+#include "rdt/pqos.hpp"
+
+namespace rdt
+{
 
 typedef struct {
     double expected_value;
@@ -37,5 +41,7 @@ public:
     MOCK_METHOD1(pqos_mon_stop, int(struct pqos_mon_data *group));
     MOCK_METHOD2(pqos_mon_poll, int(struct pqos_mon_data **groups, const unsigned num_groups));
 };
+
+}  // namespace rdt
 
 #endif // SNAP_PLUGIN_COLLECTOR_RDT_MEDIUM_TEST_HPP
