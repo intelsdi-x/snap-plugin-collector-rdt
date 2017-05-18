@@ -78,3 +78,10 @@ target_link_libraries(test-medium
         /usr/local/lib/libgrpc.a
         pthread
         )
+
+add_custom_target(dist
+        DEPENDS snap-plugin-collector-rdt
+        COMMAND cp ../NOTICE-binary ./NOTICE
+        COMMAND tar czf snap-plugin-collector-rdt.tar.gz snap-plugin-collector-rdt NOTICE
+        WORKING_DIRECTORY "${CMAKE_BINARY_DIR}"
+)
