@@ -16,6 +16,8 @@
 
 # Snap's Intel&#174; Resource Director Technology Collector
 
+[![Build Status](https://travis-ci.com/intelsdi-x/snap-plugin-collector-rdt.svg?token=umXxW83ue2prATx1hZZ9&branch=master)](https://travis-ci.com/intelsdi-x/snap-plugin-collector-rdt)
+
 Intel&#174; RDT enables Cache Occupancy measurment and Memory Bandwidth monitoring. For more information please see http://www.intel.com/content/www/us/en/architecture-and-technology/resource-director-technology.html
 
 This plugin utilizes https://github.com/01org/intel-cmt-cat. It has been tested on CentOS 7.3.1611, Kernel 3.14.32 on Xeon D-1541.
