@@ -3,10 +3,13 @@ language: cpp
 services:
   - docker
 env:
+  global:
+    - secure: "EfVmcbAqy5EN+jinIvWOepOOMXlt4LXi3LNx/wp4AHXhFSnuHqk+IZsWmhtWq680gJ0J9cYpZbQS/k2/oNUtucYkroDuBZSLRXuXugL+F/YDb3WWeH9dHkwxy1g/amAgAoRI2r/YBguC+1Lk18OvshNRkiO35eYkJ7sf3d4knEDAVBvGvKoyOAFvqT+qZuJvMmW3SjO6/2O2d80cXI4wKLuYXbk9tOqIwnrFyKbHmClGvOiHENGjXBfwW+TONdTn759DmSeD3cSPykGZP3BiPE4YZFOizTQ0FdrWW7qzx5TRhAdSNaHq5lvekUWYmqfxumigZNhe/D3U0XaMHzPwqCf4vMIXSPIAkuVsarkqRyUmM9d6NlJBnEHEySlUO1UYaOSXCoKI/atCmhPGuUx1CeddVQrpRnqcYauetKioJm44nmpTJOvTGxzOLNt8Nw6nAu+0kWysa6ObGL7NlG7Vpn3LOF2IOmGV0vjZ0d+/CC4Z42M8TrJhb2QnbEIyeC5xoNosPvTiMHClfLiu7HXi/O9vaBuigi4kSnFqDtZs5dLoosY3w0skMQ+0mWFsP+qF/NxSQwte2sJpfQvWufoKSuALkISeb8NC0U8rlnZDAWa+G27tHMidz4PYSzhgxAzM+S1xWdjwE5fSG8O2sdMpTPphCxmHJ6+qKUuaE8aBk1s="
   matrix:
     - TEST_TYPE=medium
 before_install:
   - docker build -t for-worker-box -f Docker/Dockerfile.travis .
+  - echo -n | openssl s_client -connect scan.coverity.com:443 | sed -ne '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p' | sudo tee -a /etc/ssl/certs/ca-
 install:
   - docker run -dt --name "worker-box" -e TEST_TYPE -e GTEST_ROOT -v ${TRAVIS_BUILD_DIR}/:/${TRAVIS_REPO_SLUG} for-worker-box bash
 script:
@@ -19,3 +22,12 @@ notifications:
   email: false
   slack:
     secure: VkbZLIc2RH8yf3PtIAxUNPdAu3rQQ7yQx0GcK124JhbEnZGaHyK615V0rbG7HcVmYKGPdB0cXqZiLBDKGqGKb2zR1NepOe1nF03jxGSpPq8jIFeEXSJGEYGL34ScDzZZGuG6qwbjFcXiW5lqn6t8igzp7v2+URYBaZo5ktCS2xY=
+addons:
+  coverity_scan:
+    project:
+      name: "intelsdi-x/snap-plugin-collector-rdt"
+      description: "Build submitted via Travis CI"
+    notification_email: daniel.nguyen@intel.com
+    build_command_prepend: "./configure; make clean"
+    build_command:   "make -j 4"
+    branch_pattern: coverity_scan
