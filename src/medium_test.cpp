@@ -93,7 +93,6 @@ TEST(CollectorContructor, TestConstructorSuccess)
     EXPECT_CALL(p_mock, pqos_cap_get(_, _)).WillOnce(DoAll(SetArgumentPointee<0>(p_cap), SetArgumentPointee<1>(p_cpu), Return(PQOS_RETVAL_OK)));
     EXPECT_CALL(p_mock, pqos_fini()).Times(1);
 
-    //EXPECT_NO_THROW(new rdt::Collector(&p_mock));
     EXPECT_NO_THROW({
         auto rdt = new rdt::Collector(&p_mock);
         delete (rdt);
