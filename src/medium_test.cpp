@@ -59,7 +59,10 @@ TEST(CollectorContructor, TestPQOSInitFailure)
     EXPECT_CALL(p_mock, pqos_cap_get(_, _)).Times(0);
     EXPECT_CALL(p_mock, pqos_fini()).Times(0);
 
-    EXPECT_THROW(new rdt::Collector(&p_mock), Plugin::PluginException);
+    EXPECT_THROW({
+        auto rdt = new rdt::Collector(&p_mock);
+        delete rdt;
+    }, Plugin::PluginException);
 }
 
 // Test get PQOS capabilities failure on collector construct
@@ -72,7 +75,10 @@ TEST(CollectorContructor, TestPQOSCapGetFailure)
     EXPECT_CALL(p_mock, pqos_cap_get(_, _)).WillOnce(Return(PQOS_RETVAL_ERROR));
     EXPECT_CALL(p_mock, pqos_fini()).Times(0);
 
-    EXPECT_THROW(new rdt::Collector(&p_mock), Plugin::PluginException);
+    EXPECT_THROW({
+        auto rdt = new rdt::Collector(&p_mock);
+        delete rdt;
+    }, Plugin::PluginException);
 }
 
 // Test successfull collector construct
@@ -85,9 +91,12 @@ TEST(CollectorContructor, TestConstructorSuccess)
     // Checking PQOS init failure
     EXPECT_CALL(p_mock, pqos_init(_)).WillOnce(Return(PQOS_RETVAL_OK));
     EXPECT_CALL(p_mock, pqos_cap_get(_, _)).WillOnce(DoAll(SetArgumentPointee<0>(p_cap), SetArgumentPointee<1>(p_cpu), Return(PQOS_RETVAL_OK)));
-    EXPECT_CALL(p_mock, pqos_fini()).Times(0);
+    EXPECT_CALL(p_mock, pqos_fini()).Times(1);
 
-    EXPECT_NO_THROW(new rdt::Collector(&p_mock));
+    EXPECT_NO_THROW({
+        auto rdt = new rdt::Collector(&p_mock);
+        delete (rdt);
+    });
 
     delete (p_cpu);
     delete (p_cap);
@@ -406,6 +415,8 @@ pqos_cap *mock_caps(std::vector<pqos_mon_event> events)
     auto result = (pqos_cap *)malloc(sizeof(pqos_cap) + sizeof(pqos_capability));
     result->num_cap = 1;
     result->capabilities[0] = *pqosCapMock;
+
+    delete pqosCapMock;
 
     return result;
 }

@@ -27,6 +27,8 @@ int main() {
         rdt = new rdt::Collector(pqos);
         start_collector(rdt, rdt->get_plugin_meta());
         exit_code = 0;
+    } catch (Plugin::PluginException &e) {
+        fprintf(stderr, "Plugin exception: %s\n", e.what());
     } catch (const char* what) {
         fprintf(stderr, "Cannot launch RDT Collector: %s\n", what);
     }
