@@ -26,13 +26,13 @@
 
 namespace rdt
 {
-    const std::vector<Plugin::Metric::NamespaceElement> cmt_capability_ns = {{"intel"}, {"rdt"}, {"capabilities"}, {"cmt_capability"}};
-    const std::vector<Plugin::Metric::NamespaceElement> mbm_local_monitoring_ns = {{"intel"}, {"rdt"}, {"capabilities"}, {"mbm_local_monitoring"}};
-    const std::vector<Plugin::Metric::NamespaceElement> mbm_remote_monitoring_ns = {{"intel"}, {"rdt"}, {"capabilities"}, {"mbm_remote_monitoring"}};
-    const std::vector<Plugin::Metric::NamespaceElement> l3ca_ns = {{"intel"}, {"rdt"}, {"capabilities"}, {"cache_allocation"}};
-    const std::vector<Plugin::Metric::NamespaceElement> llc_size_ns = {{"intel"}, {"rdt"}, {"capabilities"}, {"llc_size"}};
-    const std::vector<Plugin::Metric::NamespaceElement> cache_ways_count_ns = {{"intel"}, {"rdt"}, {"capabilities"}, {"cache_ways_count"}};
-    const std::vector<Plugin::Metric::NamespaceElement> cache_way_size_ns = {{"intel"}, {"rdt"}, {"capabilities"}, {"cache_way_size"}};
+    extern Plugin::Namespace cmt_capability_ns ;
+    extern Plugin::Namespace mbm_local_monitoring_ns ;
+    extern Plugin::Namespace mbm_remote_monitoring_ns ;
+    extern Plugin::Namespace l3ca_ns ;
+    extern Plugin::Namespace llc_size_ns ;
+    extern Plugin::Namespace cache_ways_count_ns ;
+    extern Plugin::Namespace cache_way_size_ns;
 
     class Collector : public Plugin::CollectorInterface
     {
@@ -42,7 +42,7 @@ namespace rdt
 
         const Plugin::ConfigPolicy get_config_policy();
         std::vector<Plugin::Metric> get_metric_types(Plugin::Config cfg);
-        void collect_metrics(std::vector<Plugin::Metric> &metrics);
+        std::vector<Plugin::Metric> collect_metrics(std::vector<Plugin::Metric> &metrics);
         Plugin::Meta get_plugin_meta();
 
         std::string name = "rdt";

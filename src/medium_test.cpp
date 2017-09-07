@@ -391,12 +391,13 @@ bool is_prefix(std::string const &prefix, std::string const &str)
 // Extract ns entries and return as single string value
 std::string extract_ns(const Plugin::Metric &metric)
 {
-    std::string ns_str;
-    for (auto const &elem : metric.ns())
-    {
-        ns_str += "/" + elem.value;
-    }
-    return ns_str;
+    return metric.ns().get_string();
+    // std::string ns_str;
+    // for (auto const &elem : metric.ns())
+    // {
+    //     ns_str += "/" + elem.value;
+    // }
+    // return ns_str;
 }
 
 // Mock capabilities object
@@ -458,38 +459,18 @@ std::vector<Plugin::Metric> fixture_metrics(unsigned cpu_cores)
 
     for (unsigned i = 0; i < cpu_cores; i++)
     {
-        Plugin::Metric::NamespaceElement dynamicCoreIdElement;
-        dynamicCoreIdElement.value = "*";
-        dynamicCoreIdElement.name = "core_id";
-        dynamicCoreIdElement.description = "Cache occupancy for core_id";
-
         std::string core_id = std::to_string(i);
-        Plugin::Metric llc_occupancy_bytes(
-            {{"intel"}, {"rdt"}, {"llc_occupancy"}, dynamicCoreIdElement, {"bytes"}},
-            "bytes",
-            "Total LLC Occupancy of CPU " + core_id + " in bytes.");
-        Plugin::Metric llc_occupancy_percentage(
-            {{"intel"}, {"rdt"}, {"llc_occupancy"}, dynamicCoreIdElement, {"percentage"}},
-            "percentage",
-            "Total LLC Occupancy of CPU " + core_id + " in bytes.");
-        Plugin::Metric local_membw_usage_bytes(
-            {{"intel"}, {"rdt"}, {"memory_bandwidth"}, {"local"}, dynamicCoreIdElement, {"bytes"}},
-            "bytes",
-            "Local memory bandwidth usage for CPU " + core_id + " in bytes.");
-        Plugin::Metric remote_membw_usage_bytes(
-            {{"intel"}, {"rdt"}, {"memory_bandwidth"}, {"remote"}, dynamicCoreIdElement, {"bytes"}},
-            "bytes",
-            "Remote memory bandwidth usage for CPU " + core_id + " in bytes.");
-        Plugin::Metric total_membw_usage_bytes(
-            {{"intel"}, {"rdt"}, {"memory_bandwidth"}, {"total"}, dynamicCoreIdElement, {"bytes"}},
-            "bytes",
-            "Total memory bandwidth usage for CPU " + core_id + " in bytes.");
 
-        metrics.push_back(llc_occupancy_bytes);
-        metrics.push_back(llc_occupancy_percentage);
-        metrics.push_back(local_membw_usage_bytes);
-        metrics.push_back(remote_membw_usage_bytes);
-        metrics.push_back(total_membw_usage_bytes);
+        metrics.push_back(Plugin::Metric(Plugin::Namespace({"intel","rdt","llc_occupancy"}).add_dynamic_element("core_id","Cache occupancy for core_id").add_static_element("bytes"),
+            "bytes","Total LLC Occupancy of CPU " + core_id + " in bytes."));
+        metrics.push_back(Plugin::Metric(Plugin::Namespace({"intel","rdt","llc_occupancy"}).add_dynamic_element("core_id","Cache occupancy for core_id").add_static_element("percentage"),
+            "percentage","Total LLC Occupancy of CPU " + core_id + " in bytes."));
+        metrics.push_back(Plugin::Metric(Plugin::Namespace({"intel","rdt","memory_bandwidth","local"}).add_dynamic_element("core_id","Cache occupancy for core_id").add_static_element("bytes"),
+            "bytes","Local memory bandwidth usage for CPU " + core_id + " in bytes."));
+        metrics.push_back(Plugin::Metric(Plugin::Namespace({"intel","rdt","memory_bandwidth","remote"}).add_dynamic_element("core_id","Cache occupancy for core_id").add_static_element("bytes"),
+            "bytes","Remote memory bandwidth usage for CPU " + core_id + " in bytes."));
+        metrics.push_back(Plugin::Metric(Plugin::Namespace({"intel","rdt","memory_bandwidth","total"}).add_dynamic_element("core_id","Cache occupancy for core_id").add_static_element("bytes"),
+            "bytes","Total memory bandwidth usage for CPU " + core_id + " in bytes."));
     }
 
     return metrics;
