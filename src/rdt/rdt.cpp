@@ -21,12 +21,11 @@
 
 namespace rdt
 {
-
-    Plugin::Namespace cmt_capability_ns =  Plugin::Namespace({"intel", "rdt", "capabilities", "cmt_capability"});
-    Plugin::Namespace mbm_local_monitoring_ns  =  Plugin::Namespace({"intel", "rdt", "capabilities", "mbm_local_monitoring"});
-    Plugin::Namespace mbm_remote_monitoring_ns  =  Plugin::Namespace({"intel", "rdt", "capabilities", "mbm_remote_monitoring"});
-    Plugin::Namespace l3ca_ns  =  Plugin::Namespace({"intel", "rdt", "capabilities", "cache_allocation"});
-    Plugin::Namespace llc_size_ns  =Plugin::Namespace({"intel", "rdt", "capabilities", "llc_size"});
+    Plugin::Namespace cmt_capability_ns = Plugin::Namespace({"intel", "rdt", "capabilities", "cmt_capability"});
+    Plugin::Namespace mbm_local_monitoring_ns = Plugin::Namespace({"intel", "rdt", "capabilities", "mbm_local_monitoring"});
+    Plugin::Namespace mbm_remote_monitoring_ns = Plugin::Namespace({"intel", "rdt", "capabilities", "mbm_remote_monitoring"});
+    Plugin::Namespace l3ca_ns = Plugin::Namespace({"intel", "rdt", "capabilities", "cache_allocation"});
+    Plugin::Namespace llc_size_ns = Plugin::Namespace({"intel", "rdt", "capabilities", "llc_size"});
     Plugin::Namespace cache_ways_count_ns = Plugin::Namespace({"intel", "rdt", "capabilities", "cache_ways_count"});
     Plugin::Namespace cache_way_size_ns = Plugin::Namespace({"intel", "rdt", "capabilities", "cache_way_size"});
 
@@ -104,10 +103,18 @@ std::vector<Plugin::Metric> Collector::get_metric_types(Plugin::Config cfg)
         for (int cpu_index = 0; cpu_index < this->core_count; cpu_index++)
         {
             std::string core_id = std::to_string(cpu_index);
-            metrics.push_back(Plugin::Metric(Plugin::Namespace({"intel","rdt","llc_occupancy"}).add_dynamic_element("core_id","Cache occupancy for core_id").add_static_element("bytes"),
-            "bytes","Total LLC Occupancy of CPU " + core_id + " in bytes."));
-            metrics.push_back(Plugin::Metric(Plugin::Namespace({"intel","rdt","llc_occupancy"}).add_dynamic_element("core_id","Cache occupancy for core_id").add_static_element("percentage"),
-            "percentage","Total LLC Occupancy of CPU " + core_id + " in bytes."));
+            metrics.push_back(Plugin::Metric(
+                Plugin::Namespace({"intel","rdt","llc_occupancy"}).
+                    add_dynamic_element("core_id","Cache occupancy for core_id").
+                    add_static_element("bytes"),
+                "bytes",
+                "Total LLC Occupancy of CPU " + core_id + " in bytes."));
+            metrics.push_back(Plugin::Metric(
+                Plugin::Namespace({"intel","rdt","llc_occupancy"}).
+                    add_dynamic_element("core_id","Cache occupancy for core_id").
+                    add_static_element("percentage"),
+                "percentage",
+                "Total LLC Occupancy of CPU " + core_id + " in bytes."));
         }
     }
 
@@ -117,40 +124,52 @@ std::vector<Plugin::Metric> Collector::get_metric_types(Plugin::Config cfg)
             std::string core_id = std::to_string(cpu_index);
 
             if (this->mbm_local_capability) {
-                metrics.push_back(Plugin::Metric(Plugin::Namespace({"intel","rdt","memory_bandwidth","local"}).add_dynamic_element("core_id","core_id to gather local memory bandwidth usage for").add_static_element("bytes"),
-                "bytes","Local memory bandwidth usage for CPU " + core_id + " in bytes."));
+                metrics.push_back(Plugin::Metric(
+                    Plugin::Namespace({"intel","rdt","memory_bandwidth","local"}).
+                        add_dynamic_element("core_id","core_id to gather local memory bandwidth usage for").
+                        add_static_element("bytes"),
+                    "bytes",
+                    "Local memory bandwidth usage for CPU " + core_id + " in bytes."));
             }
             if (this->mbm_remote_capability) {
-                metrics.push_back(Plugin::Metric(Plugin::Namespace({"intel","rdt","memory_bandwidth","remote"}).add_dynamic_element("core_id","core_id to gather remote memory bandwidth usage for").add_static_element("bytes"),
-                "bytes","Remote memory bandwidth usage for CPU " + core_id + " in bytes."));
+                metrics.push_back(Plugin::Metric(
+                    Plugin::Namespace({"intel","rdt","memory_bandwidth","remote"}).
+                        add_dynamic_element("core_id","core_id to gather remote memory bandwidth usage for").
+                        add_static_element("bytes"),
+                    "bytes",
+                    "Remote memory bandwidth usage for CPU " + core_id + " in bytes."));
                 
-                metrics.push_back(Plugin::Metric(Plugin::Namespace({"intel","rdt","memory_bandwidth","remote"}).add_dynamic_element("core_id","core_id to gather total memory bandwidth usage for").add_static_element("bytes"),
-                "bytes","Total memory bandwidth usage for CPU " + core_id + " in bytes."));
+                metrics.push_back(Plugin::Metric(
+                    Plugin::Namespace({"intel","rdt","memory_bandwidth","total"}).
+                        add_dynamic_element("core_id","core_id to gather total memory bandwidth usage for").
+                        add_static_element("bytes"),
+                    "bytes",
+                    "Total memory bandwidth usage for CPU " + core_id + " in bytes."));
             }
         }
     }
 
     // Monitoring capabilities.
     metrics.push_back(Plugin::Metric(
-            Plugin::Namespace({"intel", "rdt", "capabilities", "cmt_capability"}),
+            cmt_capability_ns,
             "bool",
             "This CPU supports LLC Cache Monitoring."
     ));
 
     metrics.push_back(Plugin::Metric(
-            Plugin::Namespace({"intel", "rdt", "capabilities", "mbm_local_monitoring"}),
+            mbm_local_monitoring_ns,
             "bool",
             "This CPU supports Local Memory Bandwidth Monitoring."
     ));
 
     metrics.push_back(Plugin::Metric(
-            Plugin::Namespace({"intel", "rdt", "capabilities", "mbm_remote_monitoring"}),
+            mbm_remote_monitoring_ns,
             "bool",
             "This CPU supports Remote Memory Bandwidth Monitoring."
     ));
 
     metrics.push_back(Plugin::Metric(
-            Plugin::Namespace({"intel", "rdt", "capabilities", "cache_allocation"}),
+            rdt::l3ca_ns,
             "bool",
             "This CPU supports L3CA capabilities."
     ));
@@ -158,27 +177,26 @@ std::vector<Plugin::Metric> Collector::get_metric_types(Plugin::Config cfg)
 
     // CAT Capabilities.
     metrics.push_back(Plugin::Metric(
-        Plugin::Namespace({"intel", "rdt", "capabilities", "llc_size"}),
+        l3ca_ns,
         "bytes",
         "LLC Size."));
 
     metrics.push_back(Plugin::Metric(
-        Plugin::Namespace({"intel", "rdt", "capabilities", "cache_ways_count"}),
+        cache_ways_count_ns,
         "bytes",
         "Number of cache ways in Last Level Cache."));
 
     metrics.push_back(Plugin::Metric(
-        Plugin::Namespace({"intel", "rdt", "capabilities", "cache_way_size"}),
+        cache_way_size_ns,
         "bytes",
         "Size of cache way in Last Level Cache."));
 
     return metrics;
 }
 
-std::vector<Plugin::Metric> Collector::collect_metrics(std::vector<Plugin::Metric> &metrics)
+std::vector<Plugin::Metric> Collector::collect_metrics(std::vector<Plugin::Metric> &mts)
 {
-    metrics.clear();
-
+        std::vector<Plugin::Metric> metrics;
         // Load metrics.
         if (!this->is_monitoring_active) {
             this->setup_monitoring();
@@ -206,7 +224,7 @@ std::vector<Plugin::Metric> Collector::collect_metrics(std::vector<Plugin::Metri
         metric.set_timestamp(now);
     }
 
-    return;
+    return metrics;
 }
 
 std::vector<Plugin::Metric> Collector::get_capabilities_metrics()
@@ -329,14 +347,20 @@ std::vector<Plugin::Metric> Collector::get_cmt_metrics() {
 
     for (auto &group : this->groups)
     {
-        Plugin::Metric cmt_bytes(Plugin::Namespace({"intel","rdt","llc_occupancy"}).add_static_element(std::to_string(group->cores[0])).add_static_element("bytes"),
-        "","");
+        Plugin::Metric cmt_bytes(
+            Plugin::Namespace({"intel","rdt","llc_occupancy"}).
+                add_static_element(std::to_string(group->cores[0])).
+                add_static_element("bytes"),
+            "","");
 
         double cmt_data = static_cast<double>(group->values.llc);
         cmt_bytes.set_data(cmt_data);
 
-        Plugin::Metric cmt_percentage(Plugin::Namespace({"intel","rdt","llc_occupancy"}).add_static_element(std::to_string(group->cores[0])).add_static_element("percentage"),
-        "","");
+        Plugin::Metric cmt_percentage(
+            Plugin::Namespace({"intel","rdt","llc_occupancy"}).
+                add_static_element(std::to_string(group->cores[0])).
+                add_static_element("percentage"),
+            "","");
         cmt_percentage.set_data((static_cast<double>(cmt_data) / static_cast<double>(this->llc_size)) * 100);
 
         metrics.push_back(cmt_bytes);
@@ -350,28 +374,28 @@ std::vector<Plugin::Metric> Collector::get_cmt_metrics() {
 
         for(auto& group : this->groups) {
             Plugin::Metric mbw;
+            std::string coreId = std::to_string(group->cores[0]);
 
             if (this->mbm_local_capability) {
-                Plugin::Metric mbw(Plugin::Namespace({"intel","rdt","memory_bandwidth","local"}).add_static_element(std::to_string(group->cores[0])).add_static_element("bytes"),
-                "","");
+                Plugin::Namespace local_ns({"intel","rdt","memory_bandwidth","local",coreId,"bytes"});
+                mbw.set_ns(local_ns);
                 double local_mbw = static_cast<double>(group->values.mbm_local_delta);
                 mbw.set_data(local_mbw);
                 metrics.push_back(mbw);
             }
 
             if (this->mbm_remote_capability) {
-                Plugin::Metric mbw(Plugin::Namespace({"intel","rdt","memory_bandwidth","remote"}).add_static_element(std::to_string(group->cores[0])).add_static_element("bytes"),
-                "","");
+                Plugin::Namespace remote_ns({"intel","rdt","memory_bandwidth","remote",coreId,"bytes"});
+                mbw.set_ns(remote_ns);
                 double remote_mbw = static_cast<double>(group->values.mbm_remote_delta);
                 mbw.set_data(remote_mbw);
                 metrics.push_back(mbw);
 
-
-                Plugin::Metric mbw2(Plugin::Namespace({"intel","rdt","memory_bandwidth","total"}).add_static_element(std::to_string(group->cores[0])).add_static_element("bytes"),
-                "","");
-                double remote_mbw2 = static_cast<double>(group->values.mbm_total_delta);
-                mbw2.set_data(remote_mbw2);
-                metrics.push_back(mbw2);
+                Plugin::Namespace total_ns({"intel","rdt","memory_bandwidth","total",coreId,"bytes"});
+                mbw.set_ns(total_ns);
+                double total_mbw = static_cast<double>(group->values.mbm_total_delta);
+                mbw.set_data(total_mbw);
+                metrics.push_back(mbw);
             }
         }
         return metrics;

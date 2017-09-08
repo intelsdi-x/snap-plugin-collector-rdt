@@ -26,12 +26,12 @@
 
 namespace rdt
 {
-    extern Plugin::Namespace cmt_capability_ns ;
-    extern Plugin::Namespace mbm_local_monitoring_ns ;
-    extern Plugin::Namespace mbm_remote_monitoring_ns ;
-    extern Plugin::Namespace l3ca_ns ;
-    extern Plugin::Namespace llc_size_ns ;
-    extern Plugin::Namespace cache_ways_count_ns ;
+    extern Plugin::Namespace cmt_capability_ns;
+    extern Plugin::Namespace mbm_local_monitoring_ns;
+    extern Plugin::Namespace mbm_remote_monitoring_ns;
+    extern Plugin::Namespace l3ca_ns;
+    extern Plugin::Namespace llc_size_ns;
+    extern Plugin::Namespace cache_ways_count_ns;
     extern Plugin::Namespace cache_way_size_ns;
 
     class Collector : public Plugin::CollectorInterface
