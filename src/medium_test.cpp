@@ -113,10 +113,10 @@ TEST(GetMetricTypesTest, TestMetricCountMultiCpu)
     EXPECT_CALL(p_mock, pqos_init(_)).WillRepeatedly(Return(PQOS_RETVAL_OK));
 
     int mts_per_core = CMT_METRICS_PER_CORE + MBM_LOCAL_METRICS_PER_CORE + MBM_REMOTE_METRICS_PER_CORE;
-    test_get_metric_types(&p_mock, p_cap, 1, CAP_METRICS + 1 * mts_per_core);
-    test_get_metric_types(&p_mock, p_cap, 2, CAP_METRICS + 2 * mts_per_core);
-    test_get_metric_types(&p_mock, p_cap, 3, CAP_METRICS + 3 * mts_per_core);
-    test_get_metric_types(&p_mock, p_cap, 4, CAP_METRICS + 4 * mts_per_core);
+    test_get_metric_types(&p_mock, p_cap, 1, CAP_METRICS + mts_per_core);
+    test_get_metric_types(&p_mock, p_cap, 2, CAP_METRICS + mts_per_core);
+    test_get_metric_types(&p_mock, p_cap, 3, CAP_METRICS + mts_per_core);
+    test_get_metric_types(&p_mock, p_cap, 4, CAP_METRICS + mts_per_core);
 
     delete (p_cap);
 }
@@ -151,10 +151,10 @@ TEST(GetMetricTypesTest, TestMetricCountMultiCpuNoCmtCap)
     EXPECT_CALL(p_mock, pqos_init(_)).WillRepeatedly(Return(PQOS_RETVAL_OK));
 
     int mts_per_core = MBM_LOCAL_METRICS_PER_CORE + MBM_REMOTE_METRICS_PER_CORE;
-    test_get_metric_types(&p_mock, p_cap, 1, CAP_METRICS + 1 * mts_per_core);
-    test_get_metric_types(&p_mock, p_cap, 2, CAP_METRICS + 2 * mts_per_core);
-    test_get_metric_types(&p_mock, p_cap, 3, CAP_METRICS + 3 * mts_per_core);
-    test_get_metric_types(&p_mock, p_cap, 4, CAP_METRICS + 4 * mts_per_core);
+    test_get_metric_types(&p_mock, p_cap, 1, CAP_METRICS + mts_per_core);
+    test_get_metric_types(&p_mock, p_cap, 2, CAP_METRICS + mts_per_core);
+    test_get_metric_types(&p_mock, p_cap, 3, CAP_METRICS + mts_per_core);
+    test_get_metric_types(&p_mock, p_cap, 4, CAP_METRICS + mts_per_core);
 
     delete (p_cap);
 }
@@ -337,7 +337,6 @@ void test_collected_metrics_content(PQOSMock *p_mock, pqos_cap *p_cap, unsigned 
     rdt::Collector *rdt = new rdt::Collector(p_mock);
     auto metrics = fixture_metrics(num_cores);
     auto mts = rdt->collect_metrics(metrics);
-    // /EXPECT_NO_THROW(rdt->collect_metrics(metrics));
 
     // Fill expected values map with per-core metric values
     for (int cpu_id = 0; cpu_id < num_cores; cpu_id++) {

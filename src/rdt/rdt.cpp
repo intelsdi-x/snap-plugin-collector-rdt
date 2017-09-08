@@ -100,36 +100,29 @@ std::vector<Plugin::Metric> Collector::get_metric_types(Plugin::Config cfg)
     // CMT Count.
     if (this->cmt_capability)
     {
-        for (int cpu_index = 0; cpu_index < this->core_count; cpu_index++)
-        {
-            std::string core_id = std::to_string(cpu_index);
             metrics.push_back(Plugin::Metric(
                 Plugin::Namespace({"intel","rdt","llc_occupancy"}).
                     add_dynamic_element("core_id","Cache occupancy for core_id").
                     add_static_element("bytes"),
                 "bytes",
-                "Total LLC Occupancy of CPU " + core_id + " in bytes."));
+                "Total LLC Occupancy for each CPU in bytes."));
             metrics.push_back(Plugin::Metric(
                 Plugin::Namespace({"intel","rdt","llc_occupancy"}).
                     add_dynamic_element("core_id","Cache occupancy for core_id").
                     add_static_element("percentage"),
                 "percentage",
-                "Total LLC Occupancy of CPU " + core_id + " in bytes."));
-        }
+                "Total LLC Occupancy for each CPU in bytes."));
     }
 
     // MBM metrics
     if (this->mbm_local_capability || this->mbm_remote_capability) {
-        for (int cpu_index = 0; cpu_index < this->core_count; cpu_index++) {
-            std::string core_id = std::to_string(cpu_index);
-
             if (this->mbm_local_capability) {
                 metrics.push_back(Plugin::Metric(
                     Plugin::Namespace({"intel","rdt","memory_bandwidth","local"}).
                         add_dynamic_element("core_id","core_id to gather local memory bandwidth usage for").
                         add_static_element("bytes"),
                     "bytes",
-                    "Local memory bandwidth usage for CPU " + core_id + " in bytes."));
+                    "Local memory bandwidth usage for each CPU in bytes."));
             }
             if (this->mbm_remote_capability) {
                 metrics.push_back(Plugin::Metric(
@@ -137,15 +130,14 @@ std::vector<Plugin::Metric> Collector::get_metric_types(Plugin::Config cfg)
                         add_dynamic_element("core_id","core_id to gather remote memory bandwidth usage for").
                         add_static_element("bytes"),
                     "bytes",
-                    "Remote memory bandwidth usage for CPU " + core_id + " in bytes."));
+                    "Remote memory bandwidth usage for each CPU in bytes."));
                 
                 metrics.push_back(Plugin::Metric(
                     Plugin::Namespace({"intel","rdt","memory_bandwidth","total"}).
                         add_dynamic_element("core_id","core_id to gather total memory bandwidth usage for").
                         add_static_element("bytes"),
                     "bytes",
-                    "Total memory bandwidth usage for CPU " + core_id + " in bytes."));
-            }
+                    "Total memory bandwidth usage for each CPU in bytes."));
         }
     }
 
