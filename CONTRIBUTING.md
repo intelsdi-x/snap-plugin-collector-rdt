@@ -34,15 +34,16 @@ This repository has dedicated developers from Intel working on updates. The most
 
 Once you're ready to contribute code back to this repo, start with these steps:
 
-* Clone the repository:
+* Fork the appropriate sub-projects that are affected by your change.
 
     ```
-$ git clone https://github.com/intelsdi-x/snap-plugin-collector-rdt.git
+    $ cd "${GOPATH}/src/github.com/intelsdi-x/"
+    $ git clone https://github.com/intelsdi-x/snap-plugin-collector-rdt.git
     ```
 * Create a topic branch for your change and checkout that branch:
 
     ```
-$ git checkout -b yourname/some-topic-branch
+    $ git checkout -b yourname/some-topic-branch
     ```
 * Make your changes to the code and add tests to cover contributed code.
 * Validate the changes and run the test suite if one is provided.
