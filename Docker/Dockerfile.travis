@@ -18,4 +18,7 @@
 FROM centos:7
 RUN yum update -y
 RUN yum groupinstall -y base
-RUN yum install -y git cmake mc tmux autoconf automake libtool curl make unzip wget clang gcc-c++
+RUN yum install -y git cmake mc tmux autoconf automake python-devel libtool zlib-devel openssl-devel curl make unzip wget golang clang bzip2-devel gcc-c++ protobuf-compiler libprotobuf-dev libprotoc-dev centos-release-scl-rh 
+RUN yum install -y devtoolset-4-gcc devtoolset-4-gcc-c++
+RUN scl enable devtoolset-4 bash
+RUN export PATH=/opt/rh/devtoolset-4/root/usr/bin/:$PATH
