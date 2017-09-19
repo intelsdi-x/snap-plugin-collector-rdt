@@ -13,7 +13,7 @@ Vagrant.configure("2") do |config|
 
   # Every Vagrant development environment requires a box. You can search for
   # boxes at https://atlas.hashicorp.com/search.
-  config.vm.box = "centos/7"
+  config.vm.box = "ubuntu/xenial64"
 
   config.vm.synced_folder "..", "/home/vagrant/snap-plugin-collector-rdt", :mount_options => ["umask=0022,dmask=0022,fmask=0022"]
 
@@ -79,14 +79,11 @@ Vagrant.configure("2") do |config|
   # Puppet, Chef, Ansible, Salt, and Docker are also available. Please see the
   # documentation for more information about their specific syntax and use.
   config.vm.provision "shell", inline: <<-SHELL
-    sudo yum update -y
-    sudo yum install -y git cmake mc tmux autoconf automake libtool zlib-devel openssl-devel curl make unzip wget golang clang gcc-c++ protobuf-compiler libprotobuf-dev libprotoc-dev centos-release-scl-rh
-    sudo yum install -y devtoolset-4-gcc devtoolset-4-gcc-c++
-    sudo scl enable devtoolset-4 bash
-    export PATH=/opt/rh/devtoolset-4/root/usr/bin/:$PATH
-    cd snap-plugin-collector-rdt
+    sudo apt-get  update && sudo apt-get  upgrade -yq
+    sudo apt-get install g++-4.9 gcc-4.9 protobuf-compiler libprotobuf-dev libprotoc-dev libboost-dev libcppnetlib-dev libspdlog-dev git curl cmake golang-go autoconf libtool ca-certificates unzip software-properties-common golang-go -yq
+    cd /home/vagrant/snap-plugin-collector-rdt
     git submodule update --init
-    ./install_deps_centos.sh
+    ./install_deps_ubuntu.sh
     ./build.sh
   SHELL
 end

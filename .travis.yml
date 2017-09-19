@@ -11,7 +11,7 @@ install:
   - docker run -dt --name "worker-box" -e TEST_TYPE -e GTEST_ROOT -v ${TRAVIS_BUILD_DIR}/:/${TRAVIS_REPO_SLUG} for-worker-box bash
 script:
   - docker exec -ti worker-box bash -c "cd /${TRAVIS_REPO_SLUG} && git submodule update --init"
-  - docker exec -ti worker-box bash -c "cd /${TRAVIS_REPO_SLUG} && ./install_deps_centos.sh"
+  - docker exec -ti worker-box bash -c "cd /${TRAVIS_REPO_SLUG} && ./install_deps_ubuntu.sh"
   - docker exec -ti worker-box bash -c "cd /${TRAVIS_REPO_SLUG} && ./test.sh"
 after_script:
   - docker rm -fv worker-box
