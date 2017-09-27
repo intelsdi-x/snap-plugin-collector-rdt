@@ -26,6 +26,7 @@ make -j2
 make install
 cp googlemock/libgmock.a ../../lib
 cp googlemock/gtest/libgtest.a ../../lib
+cp googlemock/gtest/libgtest.a /usr/lib
 popd
 
 pushd `pwd`
