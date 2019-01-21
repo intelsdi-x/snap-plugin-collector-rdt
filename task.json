@@ -1,0 +1,18 @@
+{
+	"version":1,
+	"schedule":{
+		"type":"simple",
+		"interval":"1s"
+	},
+	"max-failures":10,
+	"workflow":{
+		"collect":{
+			"metrics":{
+				"/intel/rdt/llc_occupancy/*/bytes":{},
+ 				"/intel/rdt/capabilities/cmt_capability":{},
+ 				"/intel/rdt/capabilities/cache_allocation":{},
+ 				"/intel/rdt/llc_occupancy/*/percentage":{}
+			}
+		}
+	}
+}

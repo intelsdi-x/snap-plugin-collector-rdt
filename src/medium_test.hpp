@@ -26,6 +26,7 @@ namespace rdt
 typedef struct {
     double expected_value;
     bool is_float;
+    bool is_bool;
 } rdt_metric_data;
 typedef std::unordered_map<std::string, rdt_metric_data> rdt_metric_map;
 

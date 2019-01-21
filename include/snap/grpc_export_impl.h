@@ -20,38 +20,58 @@ limitations under the License.
 #include <vector>
 
 #include <grpc++/grpc++.h>
+#include <json.hpp>
+#include <spdlog/spdlog.h>
 
 #include "snap/config.h"
 #include "snap/metric.h"
 
+namespace spd = spdlog;
 #define RPC_VERSION 1
 
 namespace Plugin {
+    /*
+    * Implementation details for GRPC plugin exporter.
+    *
+    * Instance is supposed to be held referenced by shared pointer, to retain
+    * the resources (ie.: service and server).
+    */
+    class GRPCExportImpl : public std::enable_shared_from_this<GRPCExportImpl> {
+    public:
+        std::future<void> DoExport(std::shared_ptr<PluginInterface> plugin, const Meta* meta);
+        struct handler_type;
 
-/*
- * Implementation details for GRPC plugin exporter.
- *
- * Instance is supposed to be held referenced by shared pointer, to retain
- * the resources (ie.: service and server).
- */
-class GRPCExportImpl : public std::enable_shared_from_this<GRPCExportImpl> {
-public:
-  std::future<void> DoExport(std::shared_ptr<PluginInterface> plugin, const Meta* meta);
-protected:
-  int port;
-  std::shared_ptr<PluginInterface> plugin;
-  const Meta* meta;
-  std::unique_ptr<grpc::Service> service;
-  std::unique_ptr<grpc::ServerBuilder> builder;
-  std::unique_ptr<grpc::Server> server;
+        GRPCExportImpl () {
+          _logger = spdlog::stderr_logger_mt("gprcExportImpl");
+        }
 
-  /* steps of the export procedure */
-  void doConfigure();
-  void doRegister();
-  void doAdvertise();
+    protected:
+        int port;
+        std::shared_ptr<PluginInterface> plugin;
+        const Meta* meta;
+        std::shared_ptr<grpc::ServerCredentials> credentials;
+        std::unique_ptr<grpc::Service> service;
+        std::unique_ptr<grpc::ServerBuilder> builder;
+        std::unique_ptr<grpc::Server> server;
 
-  /* blocking method - waits for the server to finish. */
-  void doJoin();
-};
+        std::shared_ptr<grpc::ServerCredentials> configureCredentials();
 
+        /* steps of the export procedure */
+        void doConfigure();
+        void doRegister();
+        nlohmann::json printPreamble();
+
+        /* blocking method - waits for the server to finish. */
+        void doJoin();
+
+        int start_stand_alone(const int &httpPort);
+    private:
+        bool file_exists(const std::string);
+        std::string readFile(std::string);
+        std::string read_if_exists(std::string);
+        std::string load_key(std::string);
+        std::string load_directory(std::string);
+        std::string load_tls_ca(std::string);
+        std::shared_ptr<spd::logger> _logger;
+    };
 }
