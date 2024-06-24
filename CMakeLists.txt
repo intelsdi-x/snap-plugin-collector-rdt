@@ -66,6 +66,12 @@ target_link_libraries(snap-plugin-collector-rdt
         /usr/local/lib/libgrpc++.a
         /usr/local/lib/libgrpc.a
         pthread
+        ssl
+        crypto
+        boost_program_options
+        boost_system
+        boost_filesystem
+        z
         )
 
 target_link_libraries(test-medium
@@ -78,6 +84,12 @@ target_link_libraries(test-medium
         /usr/local/lib/libgrpc++.a
         /usr/local/lib/libgrpc.a
         pthread
+        ssl
+        crypto
+        boost_program_options
+        boost_filesystem
+        boost_system
+        z
         )
 
 add_custom_target(dist

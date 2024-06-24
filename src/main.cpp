@@ -18,14 +18,15 @@
 #include "rdt/rdt.hpp"
 #include "rdt/pqos.hpp"
 
-int main() {
+int main(int argc, char **argv) {
     int exit_code = -1;
     auto pqos = new rdt::PQOS();
     rdt::Collector *rdt;
     try
     {
         rdt = new rdt::Collector(pqos);
-        start_collector(rdt, rdt->get_plugin_meta());
+        Plugin::Meta meta = rdt->get_plugin_meta();
+        start_collector(argc, argv, rdt, meta);
         exit_code = 0;
     } catch (Plugin::PluginException &e) {
         fprintf(stderr, "Plugin exception: %s\n", e.what());

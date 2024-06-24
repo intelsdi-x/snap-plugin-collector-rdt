@@ -15,7 +15,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-FROM centos:7
-RUN yum update -y
-RUN yum groupinstall -y base
-RUN yum install -y git cmake mc tmux autoconf automake libtool curl make unzip wget clang gcc-c++
+FROM ubuntu:xenial
+
+RUN apt-get  update && apt-get  upgrade -yq
+RUN apt-get install g++-4.9 gcc-4.9 protobuf-compiler libprotobuf-dev libprotoc-dev libboost-dev libcppnetlib-dev libspdlog-dev git curl cmake golang-go autoconf libtool ca-certificates unzip software-properties-common golang-go -yq

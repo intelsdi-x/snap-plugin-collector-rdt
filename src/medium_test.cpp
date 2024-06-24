@@ -38,7 +38,6 @@ using ::testing::Invoke;
 #define CAP_METRICS 7
 
 bool is_prefix(std::string const &prefix, std::string const &str);
-std::string extract_ns(const Plugin::Metric &metric);
 pqos_cap *mock_caps(std::vector<pqos_mon_event> events);
 pqos_cpuinfo *mock_cpu(unsigned num_cores);
 void mock_mon_poll(struct pqos_mon_data **groups, const unsigned num_groups);
@@ -114,10 +113,10 @@ TEST(GetMetricTypesTest, TestMetricCountMultiCpu)
     EXPECT_CALL(p_mock, pqos_init(_)).WillRepeatedly(Return(PQOS_RETVAL_OK));
 
     int mts_per_core = CMT_METRICS_PER_CORE + MBM_LOCAL_METRICS_PER_CORE + MBM_REMOTE_METRICS_PER_CORE;
-    test_get_metric_types(&p_mock, p_cap, 1, CAP_METRICS + 1 * mts_per_core);
-    test_get_metric_types(&p_mock, p_cap, 2, CAP_METRICS + 2 * mts_per_core);
-    test_get_metric_types(&p_mock, p_cap, 3, CAP_METRICS + 3 * mts_per_core);
-    test_get_metric_types(&p_mock, p_cap, 4, CAP_METRICS + 4 * mts_per_core);
+    test_get_metric_types(&p_mock, p_cap, 1, CAP_METRICS + mts_per_core);
+    test_get_metric_types(&p_mock, p_cap, 2, CAP_METRICS + mts_per_core);
+    test_get_metric_types(&p_mock, p_cap, 3, CAP_METRICS + mts_per_core);
+    test_get_metric_types(&p_mock, p_cap, 4, CAP_METRICS + mts_per_core);
 
     delete (p_cap);
 }
@@ -152,10 +151,10 @@ TEST(GetMetricTypesTest, TestMetricCountMultiCpuNoCmtCap)
     EXPECT_CALL(p_mock, pqos_init(_)).WillRepeatedly(Return(PQOS_RETVAL_OK));
 
     int mts_per_core = MBM_LOCAL_METRICS_PER_CORE + MBM_REMOTE_METRICS_PER_CORE;
-    test_get_metric_types(&p_mock, p_cap, 1, CAP_METRICS + 1 * mts_per_core);
-    test_get_metric_types(&p_mock, p_cap, 2, CAP_METRICS + 2 * mts_per_core);
-    test_get_metric_types(&p_mock, p_cap, 3, CAP_METRICS + 3 * mts_per_core);
-    test_get_metric_types(&p_mock, p_cap, 4, CAP_METRICS + 4 * mts_per_core);
+    test_get_metric_types(&p_mock, p_cap, 1, CAP_METRICS + mts_per_core);
+    test_get_metric_types(&p_mock, p_cap, 2, CAP_METRICS + mts_per_core);
+    test_get_metric_types(&p_mock, p_cap, 3, CAP_METRICS + mts_per_core);
+    test_get_metric_types(&p_mock, p_cap, 4, CAP_METRICS + mts_per_core);
 
     delete (p_cap);
 }
@@ -215,9 +214,10 @@ void test_collect_no_cmt_cap(PQOSMock *p_mock, pqos_cap *p_cap, unsigned num_cor
     rdt::Collector *rdt = new rdt::Collector(p_mock);
 
     auto metrics = fixture_metrics(num_cores);
+    auto mts = rdt->collect_metrics(metrics);
     EXPECT_NO_THROW(rdt->collect_metrics(metrics));
 
-    EXPECT_EQ(metrics.size(), CAP_METRICS);
+    EXPECT_EQ(mts.size(), CAP_METRICS);
     EXPECT_CALL(*p_mock, pqos_fini()).Times(1);
     delete (rdt);
     delete (p_cpu);
@@ -320,13 +320,13 @@ void test_collected_metrics_content(PQOSMock *p_mock, pqos_cap *p_cap, unsigned 
     const double llc_size = 202 * num_cores;
 
     // Global metrics independent from CPU core number
-    expected_values.emplace("/intel/rdt/capabilities/cmt_capability", rdt_metric_data{expected_value : 1, is_float: false});
-    expected_values.emplace("/intel/rdt/capabilities/mbm_local_monitoring", rdt_metric_data{expected_value : 1, is_float: false});
-    expected_values.emplace("/intel/rdt/capabilities/mbm_remote_monitoring", rdt_metric_data{expected_value : 1, is_float: false});
-    expected_values.emplace("/intel/rdt/capabilities/cache_allocation", rdt_metric_data{expected_value : 0, is_float: false});
-    expected_values.emplace("/intel/rdt/capabilities/llc_size", rdt_metric_data{expected_value : llc_size, is_float: false});
-    expected_values.emplace("/intel/rdt/capabilities/cache_ways_count", rdt_metric_data{expected_value : cache_ways_count, is_float: false});
-    expected_values.emplace("/intel/rdt/capabilities/cache_way_size", rdt_metric_data{expected_value : cache_way_size, is_float: false});
+    expected_values.emplace("/intel/rdt/capabilities/cmt_capability", rdt_metric_data{expected_value : true, is_float: false, is_bool: true});
+    expected_values.emplace("/intel/rdt/capabilities/mbm_local_monitoring", rdt_metric_data{expected_value : true, is_float: false, is_bool: true});
+    expected_values.emplace("/intel/rdt/capabilities/mbm_remote_monitoring", rdt_metric_data{expected_value : true, is_float: false, is_bool: true});
+    expected_values.emplace("/intel/rdt/capabilities/cache_allocation", rdt_metric_data{expected_value : 0, is_float: false, is_bool: false});
+    expected_values.emplace("/intel/rdt/capabilities/llc_size", rdt_metric_data{expected_value : llc_size, is_float: false, is_bool: false});
+    expected_values.emplace("/intel/rdt/capabilities/cache_ways_count", rdt_metric_data{expected_value : cache_ways_count, is_float: false, is_bool: false});
+    expected_values.emplace("/intel/rdt/capabilities/cache_way_size", rdt_metric_data{expected_value : cache_way_size, is_float: false, is_bool: false});
 
     // Mocks
     auto p_cpu = mock_cpu(num_cores);
@@ -336,7 +336,7 @@ void test_collected_metrics_content(PQOSMock *p_mock, pqos_cap *p_cap, unsigned 
     // Start collecting all metrics
     rdt::Collector *rdt = new rdt::Collector(p_mock);
     auto metrics = fixture_metrics(num_cores);
-    EXPECT_NO_THROW(rdt->collect_metrics(metrics));
+    auto mts = rdt->collect_metrics(metrics);
 
     // Fill expected values map with per-core metric values
     for (int cpu_id = 0; cpu_id < num_cores; cpu_id++) {
@@ -344,17 +344,20 @@ void test_collected_metrics_content(PQOSMock *p_mock, pqos_cap *p_cap, unsigned 
     }
 
     // Checking if collected metrics values equal expected ones
-    for (int i = 0; i < metrics.size(); i++)
+    for (int i = 0; i < mts.size(); i++)
     {
-        auto metric_ns = extract_ns(metrics[i]);
+        std::string metric_ns = "/";
+        metric_ns += mts[i].ns().get_string();
         auto tested_ns = expected_values.find(metric_ns) != expected_values.end();
         EXPECT_TRUE(tested_ns);
 
         if (tested_ns) {
             if (expected_values[metric_ns].is_float)
-                EXPECT_EQ(expected_values[metric_ns].expected_value, metrics[i].get_float64_data());
+                EXPECT_EQ(expected_values[metric_ns].expected_value, mts[i].get_float64_data());
+            else if (expected_values[metric_ns].is_bool)
+                EXPECT_EQ(expected_values[metric_ns].expected_value, mts[i].get_bool_data());
             else
-                EXPECT_EQ(expected_values[metric_ns].expected_value, metrics[i].get_int_data());
+                EXPECT_EQ(expected_values[metric_ns].expected_value, mts[i].get_int_data());
         }
     }
 
@@ -386,17 +389,6 @@ bool is_prefix(std::string const &prefix, std::string const &str)
 {
     auto res = std::mismatch(prefix.begin(), prefix.end(), str.begin());
     return res.first == prefix.end();
-}
-
-// Extract ns entries and return as single string value
-std::string extract_ns(const Plugin::Metric &metric)
-{
-    std::string ns_str;
-    for (auto const &elem : metric.ns())
-    {
-        ns_str += "/" + elem.value;
-    }
-    return ns_str;
 }
 
 // Mock capabilities object
@@ -458,38 +450,18 @@ std::vector<Plugin::Metric> fixture_metrics(unsigned cpu_cores)
 
     for (unsigned i = 0; i < cpu_cores; i++)
     {
-        Plugin::Metric::NamespaceElement dynamicCoreIdElement;
-        dynamicCoreIdElement.value = "*";
-        dynamicCoreIdElement.name = "core_id";
-        dynamicCoreIdElement.description = "Cache occupancy for core_id";
-
         std::string core_id = std::to_string(i);
-        Plugin::Metric llc_occupancy_bytes(
-            {{"intel"}, {"rdt"}, {"llc_occupancy"}, dynamicCoreIdElement, {"bytes"}},
-            "bytes",
-            "Total LLC Occupancy of CPU " + core_id + " in bytes.");
-        Plugin::Metric llc_occupancy_percentage(
-            {{"intel"}, {"rdt"}, {"llc_occupancy"}, dynamicCoreIdElement, {"percentage"}},
-            "percentage",
-            "Total LLC Occupancy of CPU " + core_id + " in bytes.");
-        Plugin::Metric local_membw_usage_bytes(
-            {{"intel"}, {"rdt"}, {"memory_bandwidth"}, {"local"}, dynamicCoreIdElement, {"bytes"}},
-            "bytes",
-            "Local memory bandwidth usage for CPU " + core_id + " in bytes.");
-        Plugin::Metric remote_membw_usage_bytes(
-            {{"intel"}, {"rdt"}, {"memory_bandwidth"}, {"remote"}, dynamicCoreIdElement, {"bytes"}},
-            "bytes",
-            "Remote memory bandwidth usage for CPU " + core_id + " in bytes.");
-        Plugin::Metric total_membw_usage_bytes(
-            {{"intel"}, {"rdt"}, {"memory_bandwidth"}, {"total"}, dynamicCoreIdElement, {"bytes"}},
-            "bytes",
-            "Total memory bandwidth usage for CPU " + core_id + " in bytes.");
 
-        metrics.push_back(llc_occupancy_bytes);
-        metrics.push_back(llc_occupancy_percentage);
-        metrics.push_back(local_membw_usage_bytes);
-        metrics.push_back(remote_membw_usage_bytes);
-        metrics.push_back(total_membw_usage_bytes);
+        metrics.push_back(Plugin::Metric(Plugin::Namespace({"intel","rdt","llc_occupancy"}).add_dynamic_element("core_id","Cache occupancy for core_id").add_static_element("bytes"),
+            "bytes","Total LLC Occupancy of CPU " + core_id + " in bytes."));
+        metrics.push_back(Plugin::Metric(Plugin::Namespace({"intel","rdt","llc_occupancy"}).add_dynamic_element("core_id","Cache occupancy for core_id").add_static_element("percentage"),
+            "percentage","Total LLC Occupancy of CPU " + core_id + " in bytes."));
+        metrics.push_back(Plugin::Metric(Plugin::Namespace({"intel","rdt","memory_bandwidth","local"}).add_dynamic_element("core_id","Cache occupancy for core_id").add_static_element("bytes"),
+            "bytes","Local memory bandwidth usage for CPU " + core_id + " in bytes."));
+        metrics.push_back(Plugin::Metric(Plugin::Namespace({"intel","rdt","memory_bandwidth","remote"}).add_dynamic_element("core_id","Cache occupancy for core_id").add_static_element("bytes"),
+            "bytes","Remote memory bandwidth usage for CPU " + core_id + " in bytes."));
+        metrics.push_back(Plugin::Metric(Plugin::Namespace({"intel","rdt","memory_bandwidth","total"}).add_dynamic_element("core_id","Cache occupancy for core_id").add_static_element("bytes"),
+            "bytes","Total memory bandwidth usage for CPU " + core_id + " in bytes."));
     }
 
     return metrics;
